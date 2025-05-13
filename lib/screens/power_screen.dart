@@ -91,7 +91,7 @@ class _PowerScreenState extends State<PowerScreen> {
         imageUrl: psu.image,
         details: [
           {'label': 'Wattage', 'value': psu.wattage},
-          {'label': 'Efficiency', 'value': psu.efficiency},
+          {'label': 'Size', 'value': psu.size},
           {'label': 'Price', 'value': psu.price},
         ],
         onRemove: isSelected ? () => listProvider.removePsu() : null,
@@ -234,8 +234,9 @@ class _PowerScreenState extends State<PowerScreen> {
                                 itemCount: psus.length,
                                 itemBuilder: (context, index) {
                                   final psu = psus[index];
-                                  final isSelected = listProvider.selectedPsu?.id == psu.id;
-                                  
+                                  final isSelected =
+                                      listProvider.selectedPsu?.id == psu.id;
+
                                   return ComponentCard(
                                     image: psu.image,
                                     name: psu.psuName,
@@ -251,7 +252,7 @@ class _PowerScreenState extends State<PowerScreen> {
                                   );
                                 },
                               ),
-                              
+
                               // Pagination
                               const SizedBox(height: 20),
                               PaginationControls(
@@ -264,7 +265,7 @@ class _PowerScreenState extends State<PowerScreen> {
                         ),
                       ),
           ),
-          
+
           // Footer
           const FooterWidget(),
         ],
@@ -272,17 +273,17 @@ class _PowerScreenState extends State<PowerScreen> {
     );
   }
 
-  Widget _buildSortButton(String text, bool isSelected, VoidCallback onPressed) {
+  Widget _buildSortButton(
+      String text, bool isSelected, VoidCallback onPressed) {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: isSelected
-            ? Theme.of(context).primaryColor
-            : Colors.grey.shade200,
+        backgroundColor:
+            isSelected ? Theme.of(context).primaryColor : Colors.grey.shade200,
         foregroundColor: isSelected ? Colors.white : Colors.black,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       ),
       child: Text(text),
     );
   }
-} 
+}

@@ -10,14 +10,14 @@ class MotherboardProvider extends ChangeNotifier {
   List<Motherboard> get motherboards => _motherboards;
   int get totalResults => _totalResults;
   bool get isLoading => _isLoading;
-  
+
   final String _baseUrl = 'http://localhost:5000';
 
   Future<void> getMotherboards({
     required int pageSize,
     required int page,
     required String searchTerm,
-    String sortParameter = 'MOBO_name',
+    String sortParameter = 'Manufacturer',
     String sortOrder = 'asc',
   }) async {
     _isLoading = true;
@@ -31,10 +31,8 @@ class MotherboardProvider extends ChangeNotifier {
         'order': sortOrder,
       };
 
-      final response = await ApiService.post(
-        '/api/mobo/getmotherboards/$page', 
-        requestBody
-      );
+      final response =
+          await ApiService.post('/api/mobo/getmotherboards/$page', requestBody);
 
       if (response != null) {
         _motherboards = List<Motherboard>.from(
@@ -55,4 +53,4 @@ class MotherboardProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-} 
+}

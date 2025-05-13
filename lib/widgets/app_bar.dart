@@ -16,7 +16,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final listProvider = Provider.of<ListProvider>(context);
-    
+
     return AppBar(
       title: Row(
         children: [
@@ -36,7 +36,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                       showModalBottomSheet(
                         context: context,
                         isScrollControlled: true,
-                        builder: (context) => buildPartsListBottomSheet(context),
+                        builder: (context) =>
+                            buildPartsListBottomSheet(context),
                       );
                     },
                   ),
@@ -192,7 +193,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                           if (listProvider.selectedMotherboard != null)
                             buildListTile(
                               'Motherboard',
-                              listProvider.selectedMotherboard!.moboName,
+                              listProvider.selectedMotherboard!.chipset,
                               listProvider.selectedMotherboard!.price,
                               listProvider.selectedMotherboard!.image,
                               () => listProvider.removeMotherboard(),
@@ -337,8 +338,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             child: Image.network(
               imageUrl,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => 
-                const Icon(Icons.image_not_supported, size: 30),
+              errorBuilder: (context, error, stackTrace) =>
+                  const Icon(Icons.image_not_supported, size: 30),
             ),
           ),
         ),
@@ -383,4 +384,4 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
-} 
+}

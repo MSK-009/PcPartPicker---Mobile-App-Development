@@ -2,21 +2,23 @@ class Gpu {
   final String id;
   final String image;
   final String gpuName;
-  final String baseClock;
-  final String boostClock;
-  final String memory;
+  final String series;
   final String tdp;
+  final String memory;
+  final String released;
   final String price;
+  final String manufacturer;
 
   Gpu({
     required this.id,
     required this.image,
     required this.gpuName,
-    required this.baseClock,
-    required this.boostClock,
-    required this.memory,
+    required this.series,
     required this.tdp,
+    required this.memory,
+    required this.released,
     required this.price,
+    required this.manufacturer,
   });
 
   factory Gpu.fromJson(Map<String, dynamic> json) {
@@ -24,11 +26,12 @@ class Gpu {
       id: json['_id'] ?? '',
       image: json['Image'] ?? '',
       gpuName: json['GPU_name'] ?? '',
-      baseClock: json['Base_clock'] ?? '',
-      boostClock: json['Boost_clock'] ?? '',
-      memory: json['Memory'] ?? '',
+      series: json['Series'] ?? '',
       tdp: json['TDP'] ?? '',
+      memory: json['VRAM'] ?? '',
+      released: json['Released'] ?? '',
       price: json['Price'] ?? '',
+      manufacturer: json['Manufacturer'] ?? '',
     );
   }
 
@@ -37,11 +40,12 @@ class Gpu {
       '_id': id,
       'Image': image,
       'GPU_name': gpuName,
-      'Base_clock': baseClock,
-      'Boost_clock': boostClock,
-      'Memory': memory,
+      'Series': series,
       'TDP': tdp,
+      'VRAM': memory,
+      'Released': released,
       'Price': price,
+      'Manufacturer': manufacturer,
     };
   }
-} 
+}

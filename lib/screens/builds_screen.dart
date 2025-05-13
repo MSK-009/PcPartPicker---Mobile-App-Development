@@ -28,9 +28,9 @@ class _BuildsScreenState extends State<BuildsScreen> {
     setState(() {
       _isLoading = true;
     });
-    
+
     await Provider.of<BuildProvider>(context, listen: false).fetchBuilds();
-    
+
     setState(() {
       _isLoading = false;
     });
@@ -55,7 +55,8 @@ class _BuildsScreenState extends State<BuildsScreen> {
               // Header
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
@@ -89,7 +90,7 @@ class _BuildsScreenState extends State<BuildsScreen> {
                   ],
                 ),
               ),
-              
+
               // Content
               Container(
                 constraints: const BoxConstraints(minHeight: 400),
@@ -134,7 +135,9 @@ class _BuildsScreenState extends State<BuildsScreen> {
                                     const SizedBox(height: 16),
                                     Text(
                                       'No Saved Builds Yet',
-                                      style: Theme.of(context).textTheme.titleLarge,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge,
                                     ),
                                     const SizedBox(height: 8),
                                     const Text(
@@ -155,11 +158,12 @@ class _BuildsScreenState extends State<BuildsScreen> {
                                 itemCount: builds.length,
                                 itemBuilder: (context, index) {
                                   final build = builds[index];
-                                  return _buildBuildCard(context, build, formatter);
+                                  return _buildBuildCard(
+                                      context, build, formatter);
                                 },
                               ),
               ),
-              
+
               // Footer
               const FooterWidget(),
             ],
@@ -174,7 +178,8 @@ class _BuildsScreenState extends State<BuildsScreen> {
     );
   }
 
-  Widget _buildBuildCard(BuildContext context, Build build, NumberFormat formatter) {
+  Widget _buildBuildCard(
+      BuildContext context, Build build, NumberFormat formatter) {
     final buildProvider = Provider.of<BuildProvider>(context, listen: false);
     final listProvider = Provider.of<ListProvider>(context, listen: false);
 
@@ -234,7 +239,7 @@ class _BuildsScreenState extends State<BuildsScreen> {
               ],
             ),
           ),
-          
+
           // Build Components
           Padding(
             padding: const EdgeInsets.all(16),
@@ -246,7 +251,8 @@ class _BuildsScreenState extends State<BuildsScreen> {
                 if (build.gpu != null)
                   _buildComponentItem('Graphics Card', build.gpu!.gpuName),
                 if (build.motherboard != null)
-                  _buildComponentItem('Motherboard', build.motherboard!.moboName),
+                  _buildComponentItem(
+                      'Motherboard', build.motherboard!.chipset),
                 if (build.ram != null)
                   _buildComponentItem('RAM', build.ram!.ramName),
                 if (build.ssd != null)
@@ -258,7 +264,7 @@ class _BuildsScreenState extends State<BuildsScreen> {
               ],
             ),
           ),
-          
+
           // Actions
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -320,12 +326,14 @@ class _BuildsScreenState extends State<BuildsScreen> {
     );
   }
 
-  Future<void> _showDeleteConfirmationDialog(BuildContext context, Build build) async {
+  Future<void> _showDeleteConfirmationDialog(
+      BuildContext context, Build build) async {
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Build'),
-        content: Text('Are you sure you want to delete "${build.name}"? This action cannot be undone.'),
+        content: Text(
+            'Are you sure you want to delete "${build.name}"? This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () {
@@ -336,19 +344,20 @@ class _BuildsScreenState extends State<BuildsScreen> {
           ElevatedButton(
             onPressed: () async {
               Navigator.of(context).pop();
-              
+
               if (build.id != null) {
                 setState(() {
                   _isLoading = true;
                 });
-                
-                final success = await Provider.of<BuildProvider>(context, listen: false)
-                    .deleteBuild(build.id!);
-                
+
+                final success =
+                    await Provider.of<BuildProvider>(context, listen: false)
+                        .deleteBuild(build.id!);
+
                 setState(() {
                   _isLoading = false;
                 });
-                
+
                 if (success && mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -376,39 +385,40 @@ class _BuildsScreenState extends State<BuildsScreen> {
     );
   }
 
-  void _loadBuildToEditor(BuildContext context, Build build, ListProvider listProvider) {
+  void _loadBuildToEditor(
+      BuildContext context, Build build, ListProvider listProvider) {
     // Set all components in the list provider
     if (build.processor != null) {
       listProvider.setProcessor(build.processor!);
     }
-    
+
     if (build.gpu != null) {
       listProvider.setGpu(build.gpu!);
     }
-    
+
     if (build.motherboard != null) {
       listProvider.setMotherboard(build.motherboard!);
     }
-    
+
     if (build.ram != null) {
       listProvider.setRam(build.ram!);
     }
-    
+
     if (build.ssd != null) {
       listProvider.setSsd(build.ssd!);
     }
-    
+
     if (build.pcCase != null) {
       listProvider.setCase(build.pcCase!);
     }
-    
+
     if (build.psu != null) {
       listProvider.setPsu(build.psu!);
     }
-    
+
     // Navigate to the final build screen
     context.go('/final');
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Loaded build "${build.name}"'),
@@ -422,4 +432,4 @@ class _BuildsScreenState extends State<BuildsScreen> {
     final formatter = DateFormat('MMM d, yyyy');
     return formatter.format(date);
   }
-} 
+}

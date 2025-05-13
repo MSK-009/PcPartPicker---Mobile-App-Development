@@ -22,7 +22,7 @@ class _MotherboardScreenState extends State<MotherboardScreen> {
   int _page = 1;
   String _searchTerm = '';
   int _pageSize = 12;
-  String _sortParameter = 'MOBO_name';
+  String _sortParameter = 'Manufacturer';
   String _sortOrder = 'asc';
   bool _isLoading = false;
 
@@ -37,7 +37,8 @@ class _MotherboardScreenState extends State<MotherboardScreen> {
       _isLoading = true;
     });
 
-    await Provider.of<MotherboardProvider>(context, listen: false).getMotherboards(
+    await Provider.of<MotherboardProvider>(context, listen: false)
+        .getMotherboards(
       pageSize: _pageSize,
       page: _page,
       searchTerm: _searchTerm,
@@ -87,13 +88,16 @@ class _MotherboardScreenState extends State<MotherboardScreen> {
     showDialog(
       context: context,
       builder: (context) => ComponentDetailsDialog(
-        title: motherboard.moboName,
+        title: '${motherboard.manufacturer} ${motherboard.chipset}',
         imageUrl: motherboard.image,
         details: [
+          {'label': 'Socket', 'value': motherboard.socket},
           {'label': 'Chipset', 'value': motherboard.chipset},
           {'label': 'Form Factor', 'value': motherboard.formFactor},
           {'label': 'Memory Slots', 'value': motherboard.memorySlots},
-          {'label': 'Price', 'value': motherboard.price},
+          {'label': 'Memory Type', 'value': motherboard.memoryType},
+          {'label': 'Manufacturer', 'value': motherboard.manufacturer},
+          {'label': 'Price', 'value': '\$${motherboard.price}'},
         ],
         onRemove: isSelected ? () => listProvider.removeMotherboard() : null,
         isSelected: isSelected,
@@ -102,10 +106,11 @@ class _MotherboardScreenState extends State<MotherboardScreen> {
   }
 
   void _selectMotherboard(Motherboard motherboard) {
-    Provider.of<ListProvider>(context, listen: false).setMotherboard(motherboard);
+    Provider.of<ListProvider>(context, listen: false)
+        .setMotherboard(motherboard);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('${motherboard.moboName} added to your build'),
+        content: Text('${motherboard.chipset} added to your build'),
         backgroundColor: Theme.of(context).primaryColor,
         duration: const Duration(seconds: 2),
         action: SnackBarAction(
@@ -196,14 +201,14 @@ class _MotherboardScreenState extends State<MotherboardScreen> {
                     const SizedBox(width: 8),
                     _buildSortButton(
                       'Name A-Z',
-                      _sortParameter == 'MOBO_name' && _sortOrder == 'asc',
-                      () => _onSortChanged('MOBO_name', 'asc'),
+                      _sortParameter == 'Manufacturer' && _sortOrder == 'asc',
+                      () => _onSortChanged('Manufacturer', 'asc'),
                     ),
                     const SizedBox(width: 8),
                     _buildSortButton(
                       'Name Z-A',
-                      _sortParameter == 'MOBO_name' && _sortOrder == 'desc',
-                      () => _onSortChanged('MOBO_name', 'desc'),
+                      _sortParameter == 'Manufacturer' && _sortOrder == 'desc',
+                      () => _onSortChanged('Manufacturer', 'desc'),
                     ),
                   ],
                 ),
@@ -235,12 +240,15 @@ class _MotherboardScreenState extends State<MotherboardScreen> {
                                 itemCount: motherboards.length,
                                 itemBuilder: (context, index) {
                                   final motherboard = motherboards[index];
-                                  final isSelected = listProvider.selectedMotherboard?.id == motherboard.id;
-                                  
+                                  final isSelected =
+                                      listProvider.selectedMotherboard?.id ==
+                                          motherboard.id;
+
                                   return ComponentCard(
                                     image: motherboard.image,
-                                    name: motherboard.moboName,
-                                    price: motherboard.price,
+                                    name:
+                                        '${motherboard.manufacturer} ${motherboard.chipset}',
+                                    price: '\$${motherboard.price}',
                                     isSelected: isSelected,
                                     onTap: () {
                                       if (isSelected) {
@@ -252,7 +260,7 @@ class _MotherboardScreenState extends State<MotherboardScreen> {
                                   );
                                 },
                               ),
-                              
+
                               // Pagination
                               const SizedBox(height: 20),
                               PaginationControls(
@@ -265,7 +273,7 @@ class _MotherboardScreenState extends State<MotherboardScreen> {
                         ),
                       ),
           ),
-          
+
           // Footer
           const FooterWidget(),
         ],
@@ -273,17 +281,17 @@ class _MotherboardScreenState extends State<MotherboardScreen> {
     );
   }
 
-  Widget _buildSortButton(String text, bool isSelected, VoidCallback onPressed) {
+  Widget _buildSortButton(
+      String text, bool isSelected, VoidCallback onPressed) {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: isSelected
-            ? Theme.of(context).primaryColor
-            : Colors.grey.shade200,
+        backgroundColor:
+            isSelected ? Theme.of(context).primaryColor : Colors.grey.shade200,
         foregroundColor: isSelected ? Colors.white : Colors.black,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       ),
       child: Text(text),
     );
   }
-} 
+}

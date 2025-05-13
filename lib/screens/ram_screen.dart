@@ -90,8 +90,10 @@ class _RamScreenState extends State<RamScreen> {
         title: ram.ramName,
         imageUrl: ram.image,
         details: [
-          {'label': 'Speed', 'value': ram.speed},
-          {'label': 'Capacity', 'value': ram.capacity},
+          {'label': 'Latency', 'value': ram.latency},
+          {'label': 'Multicore R/W', 'value': ram.multicore},
+          {'label': 'Singlecore R/W', 'value': ram.singlecore},
+          {'label': 'Released', 'value': ram.released},
           {'label': 'Price', 'value': ram.price},
         ],
         onRemove: isSelected ? () => listProvider.removeRam() : null,
@@ -234,8 +236,9 @@ class _RamScreenState extends State<RamScreen> {
                                 itemCount: rams.length,
                                 itemBuilder: (context, index) {
                                   final ram = rams[index];
-                                  final isSelected = listProvider.selectedRam?.id == ram.id;
-                                  
+                                  final isSelected =
+                                      listProvider.selectedRam?.id == ram.id;
+
                                   return SizedBox(
                                     height: 280, // Fixed height for each card
                                     child: ComponentCard(
@@ -254,7 +257,7 @@ class _RamScreenState extends State<RamScreen> {
                                   );
                                 },
                               ),
-                              
+
                               // Pagination
                               const SizedBox(height: 20),
                               PaginationControls(
@@ -267,7 +270,7 @@ class _RamScreenState extends State<RamScreen> {
                         ),
                       ),
           ),
-          
+
           // Footer
           const FooterWidget(),
         ],
@@ -275,17 +278,17 @@ class _RamScreenState extends State<RamScreen> {
     );
   }
 
-  Widget _buildSortButton(String text, bool isSelected, VoidCallback onPressed) {
+  Widget _buildSortButton(
+      String text, bool isSelected, VoidCallback onPressed) {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: isSelected
-            ? Theme.of(context).primaryColor
-            : Colors.grey.shade200,
+        backgroundColor:
+            isSelected ? Theme.of(context).primaryColor : Colors.grey.shade200,
         foregroundColor: isSelected ? Colors.white : Colors.black,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       ),
       child: Text(text),
     );
   }
-} 
+}

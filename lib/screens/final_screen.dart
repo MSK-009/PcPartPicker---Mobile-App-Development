@@ -78,12 +78,12 @@ class FinalScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        
+
                         // Components List
                         _buildComponentsList(context, listProvider),
-                        
+
                         const SizedBox(height: 30),
-                        
+
                         // Summary
                         const Text(
                           'Summary',
@@ -93,11 +93,11 @@ class FinalScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        
+
                         _buildSummaryCard(context, listProvider),
-                        
+
                         const SizedBox(height: 30),
-                        
+
                         // Actions
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -124,9 +124,11 @@ class FinalScreen extends StatelessWidget {
                                         onPressed: () {
                                           listProvider.clearAllItems();
                                           Navigator.of(context).pop();
-                                          ScaffoldMessenger.of(context).showSnackBar(
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
                                             const SnackBar(
-                                              content: Text('All components have been removed'),
+                                              content: Text(
+                                                  'All components have been removed'),
                                               backgroundColor: Colors.red,
                                             ),
                                           );
@@ -143,7 +145,8 @@ class FinalScreen extends StatelessWidget {
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: Colors.red,
                                 side: const BorderSide(color: Colors.red),
-                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 24, vertical: 16),
                               ),
                             ),
                             const SizedBox(width: 16),
@@ -151,11 +154,13 @@ class FinalScreen extends StatelessWidget {
                               icon: const Icon(Icons.save),
                               label: const Text('Save Build'),
                               onPressed: () {
-                                _showSaveBuildDialog(context, listProvider, totalPrice);
+                                _showSaveBuildDialog(
+                                    context, listProvider, totalPrice);
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Theme.of(context).primaryColor,
-                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 24, vertical: 16),
                               ),
                             ),
                             const SizedBox(width: 16),
@@ -166,7 +171,8 @@ class FinalScreen extends StatelessWidget {
                                 context.go('/builds');
                               },
                               style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 24, vertical: 16),
                               ),
                             ),
                           ],
@@ -198,7 +204,7 @@ class FinalScreen extends StatelessWidget {
             () => context.go('/processors'),
             () => listProvider.removeProcessor(),
           ),
-          
+
         // GPU
         if (listProvider.selectedGpu != null)
           _buildComponentItem(
@@ -210,19 +216,19 @@ class FinalScreen extends StatelessWidget {
             () => context.go('/gpu'),
             () => listProvider.removeGpu(),
           ),
-          
+
         // Motherboard
         if (listProvider.selectedMotherboard != null)
           _buildComponentItem(
             context,
             'Motherboard',
-            listProvider.selectedMotherboard!.moboName,
+            listProvider.selectedMotherboard!.chipset,
             listProvider.selectedMotherboard!.price,
             listProvider.selectedMotherboard!.image,
             () => context.go('/motherboard'),
             () => listProvider.removeMotherboard(),
           ),
-          
+
         // RAM
         if (listProvider.selectedRam != null)
           _buildComponentItem(
@@ -234,7 +240,7 @@ class FinalScreen extends StatelessWidget {
             () => context.go('/memory'),
             () => listProvider.removeRam(),
           ),
-          
+
         // Storage
         if (listProvider.selectedSsd != null)
           _buildComponentItem(
@@ -246,7 +252,7 @@ class FinalScreen extends StatelessWidget {
             () => context.go('/storage'),
             () => listProvider.removeSsd(),
           ),
-          
+
         // Case
         if (listProvider.selectedCase != null)
           _buildComponentItem(
@@ -258,7 +264,7 @@ class FinalScreen extends StatelessWidget {
             () => context.go('/cases'),
             () => listProvider.removeCase(),
           ),
-          
+
         // PSU
         if (listProvider.selectedPsu != null)
           _buildComponentItem(
@@ -307,14 +313,14 @@ class FinalScreen extends StatelessWidget {
                 child: Image.network(
                   imageUrl,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => 
-                    const Center(child: Icon(Icons.image_not_supported, size: 40)),
+                  errorBuilder: (context, error, stackTrace) => const Center(
+                      child: Icon(Icons.image_not_supported, size: 40)),
                 ),
               ),
             ),
-            
+
             const SizedBox(width: 16),
-            
+
             // Details
             Expanded(
               child: Column(
@@ -346,7 +352,7 @@ class FinalScreen extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             // Actions
             Column(
               children: [
@@ -461,14 +467,14 @@ class FinalScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   ...missing.map((item) => Padding(
-                    padding: const EdgeInsets.only(left: 32, bottom: 4),
-                    child: Text(
-                      '• $item',
-                      style: const TextStyle(
-                        fontSize: 14,
-                      ),
-                    ),
-                  )),
+                        padding: const EdgeInsets.only(left: 32, bottom: 4),
+                        child: Text(
+                          '• $item',
+                          style: const TextStyle(
+                            fontSize: 14,
+                          ),
+                        ),
+                      )),
                 ],
               ),
           ],
@@ -526,9 +532,11 @@ class FinalScreen extends StatelessWidget {
     return formatter.format(date);
   }
 
-  Future<void> _showSaveBuildDialog(BuildContext context, ListProvider listProvider, double totalPrice) async {
-    final TextEditingController nameController = TextEditingController(text: 'My PC Build');
-    
+  Future<void> _showSaveBuildDialog(BuildContext context,
+      ListProvider listProvider, double totalPrice) async {
+    final TextEditingController nameController =
+        TextEditingController(text: 'My PC Build');
+
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -555,10 +563,10 @@ class FinalScreen extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () async {
-              final String buildName = nameController.text.trim().isNotEmpty 
+              final String buildName = nameController.text.trim().isNotEmpty
                   ? nameController.text.trim()
                   : 'My PC Build';
-              
+
               // Create build object
               final build = Build(
                 name: buildName,
@@ -571,9 +579,9 @@ class FinalScreen extends StatelessWidget {
                 psu: listProvider.selectedPsu,
                 totalPrice: totalPrice,
               );
-              
+
               Navigator.of(context).pop();
-              
+
               // Show loading indicator
               showDialog(
                 context: context,
@@ -589,13 +597,15 @@ class FinalScreen extends StatelessWidget {
                   ),
                 ),
               );
-              
+
               // Save the build
-              final success = await Provider.of<BuildProvider>(context, listen: false).saveBuild(build);
-              
+              final success =
+                  await Provider.of<BuildProvider>(context, listen: false)
+                      .saveBuild(build);
+
               // Close loading dialog
               Navigator.of(context).pop();
-              
+
               // Show result
               if (success) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -626,4 +636,4 @@ class FinalScreen extends StatelessWidget {
       ),
     );
   }
-} 
+}

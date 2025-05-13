@@ -1,17 +1,17 @@
 class Psu {
   final String id;
   final String image;
+  final String size;
   final String psuName;
   final String wattage;
-  final String efficiency;
   final String price;
 
   Psu({
     required this.id,
     required this.image,
+    required this.size,
     required this.psuName,
     required this.wattage,
-    required this.efficiency,
     required this.price,
   });
 
@@ -19,9 +19,9 @@ class Psu {
     return Psu(
       id: json['_id'] ?? '',
       image: json['Image'] ?? '',
+      size: json['Size'] ?? '',
       psuName: json['PSU_name'] ?? '',
       wattage: json['Wattage'] ?? '',
-      efficiency: json['Efficiency'] ?? '',
       price: json['Price'] ?? '',
     );
   }
@@ -30,10 +30,10 @@ class Psu {
     return {
       '_id': id,
       'Image': image,
+      'Size': size,
       'PSU_name': psuName,
       'Wattage': wattage,
-      'Efficiency': efficiency,
       'Price': price,
     };
   }
-} 
+}

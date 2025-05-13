@@ -90,11 +90,12 @@ class _GraphicsScreenState extends State<GraphicsScreen> {
         title: gpu.gpuName,
         imageUrl: gpu.image,
         details: [
-          {'label': 'Base Clock', 'value': gpu.baseClock},
-          {'label': 'Boost Clock', 'value': gpu.boostClock},
-          {'label': 'Memory', 'value': gpu.memory},
+          {'label': 'Series', 'value': gpu.series},
           {'label': 'TDP', 'value': gpu.tdp},
+          {'label': 'Memory', 'value': gpu.memory},
+          {'label': 'Released', 'value': gpu.released},
           {'label': 'Price', 'value': gpu.price},
+          {'label': 'Manufacturer', 'value': gpu.manufacturer},
         ],
         onRemove: isSelected ? () => listProvider.removeGpu() : null,
         isSelected: isSelected,
@@ -235,8 +236,9 @@ class _GraphicsScreenState extends State<GraphicsScreen> {
                                 itemCount: gpus.length,
                                 itemBuilder: (context, index) {
                                   final gpu = gpus[index];
-                                  final isSelected = listProvider.selectedGpu?.id == gpu.id;
-                                  
+                                  final isSelected =
+                                      listProvider.selectedGpu?.id == gpu.id;
+
                                   return SizedBox(
                                     height: 280, // Fixed height for each card
                                     child: ComponentCard(
@@ -255,7 +257,7 @@ class _GraphicsScreenState extends State<GraphicsScreen> {
                                   );
                                 },
                               ),
-                              
+
                               // Pagination
                               const SizedBox(height: 20),
                               PaginationControls(
@@ -268,7 +270,7 @@ class _GraphicsScreenState extends State<GraphicsScreen> {
                         ),
                       ),
           ),
-          
+
           // Footer
           const FooterWidget(),
         ],
@@ -276,17 +278,17 @@ class _GraphicsScreenState extends State<GraphicsScreen> {
     );
   }
 
-  Widget _buildSortButton(String text, bool isSelected, VoidCallback onPressed) {
+  Widget _buildSortButton(
+      String text, bool isSelected, VoidCallback onPressed) {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: isSelected
-            ? Theme.of(context).primaryColor
-            : Colors.grey.shade200,
+        backgroundColor:
+            isSelected ? Theme.of(context).primaryColor : Colors.grey.shade200,
         foregroundColor: isSelected ? Colors.white : Colors.black,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       ),
       child: Text(text),
     );
   }
-} 
+}
