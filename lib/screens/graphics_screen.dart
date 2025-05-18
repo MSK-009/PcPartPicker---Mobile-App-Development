@@ -285,21 +285,21 @@ class _GraphicsScreenState extends State<GraphicsScreen> {
                           child: Column(
                             children: [
                               // Grid of GPU Cards
-                              AlignedGridView.count(
-                                crossAxisCount: 2,
-                                mainAxisSpacing: 16,
-                                crossAxisSpacing: 16,
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: gpus.length,
-                                itemBuilder: (context, index) {
-                                  final gpu = gpus[index];
-                                  final isSelected =
-                                      listProvider.selectedGpu?.id == gpu.id;
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                                child: AlignedGridView.count(
+                                  crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
+                                  mainAxisSpacing: 12,
+                                  crossAxisSpacing: 12,
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: gpus.length,
+                                  itemBuilder: (context, index) {
+                                    final gpu = gpus[index];
+                                    final isSelected =
+                                        listProvider.selectedGpu?.id == gpu.id;
 
-                                  return SizedBox(
-                                    height: 280, // Fixed height for each card
-                                    child: ComponentCard(
+                                    return ComponentCard(
                                       image: gpu.image,
                                       name: gpu.gpuName,
                                       price: gpu.price,
@@ -339,9 +339,9 @@ class _GraphicsScreenState extends State<GraphicsScreen> {
                                           _showGpuDetails(gpu);
                                         }
                                       },
-                                    ),
-                                  );
-                                },
+                                    );
+                                  },
+                                ),
                               ),
 
                               // Only show pagination in normal mode
@@ -376,6 +376,36 @@ class _GraphicsScreenState extends State<GraphicsScreen> {
         ],
       ),
     );
+
+    // After the builder mode check, add:
+
+    // Builder mode instructions
+    if (widget.isBuilderMode)
+      Container(
+        padding: const EdgeInsets.all(12),
+        color: Theme.of(context).primaryColor.withOpacity(0.1),
+        width: double.infinity,
+        child: Text(
+          'Select a graphics card for your build',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).primaryColor,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      );
+
+    // Search Field for builder mode
+    if (widget.isBuilderMode)
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: SearchWidget(
+          searchTerm: _searchTerm,
+          onSearchChanged: _onSearchChanged,
+          hintText: 'Search graphics cards...',
+        ),
+      );
 
     return screenWidget;
   }

@@ -17,23 +17,62 @@ class BuildsScreen extends StatefulWidget {
 
 class _BuildsScreenState extends State<BuildsScreen> {
   bool _isLoading = false;
+  bool _hasLoadedBuilds = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _loadBuilds();
+@override
+void didChangeDependencies() {
+  super.didChangeDependencies();
+  if (!_hasLoadedBuilds) {
+    _loadBuilds().then((_) {
+      // After initial load, try to refresh any builds with placeholders
+      _refreshBuildsWithPlaceholders();
+    });
+    _hasLoadedBuilds = true;
   }
+}
+
+// Add this method to fetch full data for builds with placeholders
+Future<void> _refreshBuildsWithPlaceholders() async {
+  final buildProvider = Provider.of<BuildProvider>(context, listen: false);
+  final builds = buildProvider.builds;
+  
+  // Only process a few builds at a time to avoid overwhelming the API
+  final buildsToUpdate = builds.take(5).where((build) => 
+    (build.processor?.cpuName == 'Loading...') ||
+    (build.gpu?.gpuName == 'Loading...') ||
+    (build.motherboard?.chipset == 'Loading...') ||
+    (build.ram?.ramName == 'Loading...') ||
+    (build.ssd?.ssdName == 'Loading...') ||
+    (build.pcCase?.caseName == 'Loading...') ||
+    (build.psu?.psuName == 'Loading...')
+  ).toList();
+  
+  for (final build in buildsToUpdate) {
+    if (build.id != null && mounted) {
+      await buildProvider.updateBuildWithFullData(build.id!);
+    }
+  }
+}
 
   Future<void> _loadBuilds() async {
+    if (!mounted) return;
+    
     setState(() {
       _isLoading = true;
     });
 
-    await Provider.of<BuildProvider>(context, listen: false).fetchBuilds();
+    try {
+      await Provider.of<BuildProvider>(context, listen: false).fetchBuilds();
+    } catch (e) {
+      debugPrint('Error loading builds: $e');
+      // Error is already handled in the provider
+    }
 
-    setState(() {
-      _isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -298,6 +337,9 @@ class _BuildsScreenState extends State<BuildsScreen> {
   }
 
   Widget _buildComponentItem(String label, String value) {
+    // Handle placeholder "Loading..." values by showing a loading indicator
+    final bool isPlaceholder = value == 'Loading...';
+    
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
@@ -314,12 +356,33 @@ class _BuildsScreenState extends State<BuildsScreen> {
             ),
           ),
           Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            child: isPlaceholder
+              ? Row(
+                  children: [
+                    const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Loading...',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey[600],
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
+                )
+              : Text(
+                  value,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
           ),
         ],
       ),
@@ -385,8 +448,77 @@ class _BuildsScreenState extends State<BuildsScreen> {
     );
   }
 
-  void _loadBuildToEditor(
-      BuildContext context, Build build, ListProvider listProvider) {
+  Future<void> _loadBuildToEditor(
+      BuildContext context, Build build, ListProvider listProvider) async {
+    // Check if any component has placeholder data (Loading...)
+    bool hasPlaceholders = false;
+    if (build.processor != null && build.processor!.cpuName == 'Loading...') hasPlaceholders = true;
+    if (build.gpu != null && build.gpu!.gpuName == 'Loading...') hasPlaceholders = true;
+    if (build.motherboard != null && build.motherboard!.chipset == 'Loading...') hasPlaceholders = true;
+    if (build.ram != null && build.ram!.ramName == 'Loading...') hasPlaceholders = true;
+    if (build.ssd != null && build.ssd!.ssdName == 'Loading...') hasPlaceholders = true;
+    if (build.pcCase != null && build.pcCase!.caseName == 'Loading...') hasPlaceholders = true;
+    if (build.psu != null && build.psu!.psuName == 'Loading...') hasPlaceholders = true;
+    
+    if (hasPlaceholders && build.id != null) {
+      // Show loading dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('Loading full component details...'),
+            ],
+          ),
+        ),
+      );
+      
+      try {
+        // Fetch the full build data with component details
+        await Provider.of<BuildProvider>(context, listen: false).fetchBuildById(build.id!);
+        
+        // Close loading dialog
+        Navigator.of(context).pop();
+        
+        // Get the updated build with full component details
+        final updatedBuild = Provider.of<BuildProvider>(context, listen: false).selectedBuild;
+        
+        if (updatedBuild != null) {
+          // Use the updated build
+          _populateComponents(context, updatedBuild, listProvider);
+        } else {
+          // If we couldn't fetch the updated build, use what we have
+          _populateComponents(context, build, listProvider);
+        }
+      } catch (e) {
+        // Close loading dialog
+        Navigator.of(context).pop();
+        
+        // Show error and use what we have
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not load some component details'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        
+        _populateComponents(context, build, listProvider);
+      }
+    } else {
+      // No placeholders, use the build directly
+      _populateComponents(context, build, listProvider);
+    }
+  }
+  
+  // Helper method to set all the components from a build into the list provider
+  void _populateComponents(BuildContext context, Build build, ListProvider listProvider) {
+    // Clear all components first
+    listProvider.clearAllItems();
+    
     // Set all components in the list provider
     if (build.processor != null) {
       listProvider.setProcessor(build.processor!);
@@ -429,7 +561,12 @@ class _BuildsScreenState extends State<BuildsScreen> {
 
   String _formatDate(String dateString) {
     final date = DateTime.parse(dateString);
+    
+    // Convert to Pakistan time zone (UTC+5)
+    final pakistanTime = date.add(const Duration(hours: 5));
+    
+    // Format the date for display
     final formatter = DateFormat('MMM d, yyyy');
-    return formatter.format(date);
+    return formatter.format(pakistanTime);
   }
 }

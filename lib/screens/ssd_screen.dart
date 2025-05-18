@@ -119,7 +119,9 @@ class _SsdScreenState extends State<SsdScreen> {
         imageUrl: ssd.image,
         details: [
           {'label': 'Capacity', 'value': ssd.capacity},
-          {'label': 'Interface', 'value': ssd.interface},
+          {'label': 'Format', 'value': ssd.format},
+          {'label': 'Protocol', 'value': ssd.protocol},
+          {'label': 'Released', 'value': ssd.released},
           {'label': 'Price', 'value': ssd.price},
         ],
         onRemove: isSelected ? () => listProvider.removeSsd() : null,
@@ -253,60 +255,63 @@ class _SsdScreenState extends State<SsdScreen> {
                           child: Column(
                             children: [
                               // Grid of SSD Cards
-                              AlignedGridView.count(
-                                crossAxisCount: 2,
-                                mainAxisSpacing: 16,
-                                crossAxisSpacing: 16,
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: ssds.length,
-                                itemBuilder: (context, index) {
-                                  final ssd = ssds[index];
-                                  final isSelected =
-                                      listProvider.selectedSsd?.id == ssd.id;
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                                child: AlignedGridView.count(
+                                  crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
+                                  mainAxisSpacing: 12,
+                                  crossAxisSpacing: 12,
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: ssds.length,
+                                  itemBuilder: (context, index) {
+                                    final ssd = ssds[index];
+                                    final isSelected =
+                                        listProvider.selectedSsd?.id == ssd.id;
 
-                                  return ComponentCard(
-                                    image: ssd.image,
-                                    name: ssd.ssdName,
-                                    price: ssd.price,
-                                    isSelected: isSelected,
-                                    onTap: () {
-                                      if (isSelected) {
-                                        // If already selected, show details
-                                        _showSsdDetails(ssd);
-                                      } else if (widget.isBuilderMode) {
-                                        // Only allow selection in builder mode
-                                        _selectSsd(ssd);
-                                        
-                                        // Show confirmation dialog and automatically proceed to next step
-                                        showDialog(
-                                          context: context,
-                                          barrierDismissible: false,
-                                          builder: (context) => AlertDialog(
-                                            title: const Text('Storage Selected'),
-                                            content: Text('${ssd.ssdName} has been added to your build.'),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();
-                                                  // Find the parent PcBuilderScreen and call its nextStep method
-                                                  final ancestor = context.findAncestorStateOfType<PcBuilderScreenState>();
-                                                  if (ancestor != null) {
-                                                    ancestor.nextStep();
-                                                  }
-                                                },
-                                                child: const Text('NEXT'),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      } else {
-                                        // In browse mode, just show details instead of selecting
-                                        _showSsdDetails(ssd);
-                                      }
-                                    },
-                                  );
-                                },
+                                    return ComponentCard(
+                                      image: ssd.image,
+                                      name: ssd.ssdName,
+                                      price: ssd.price,
+                                      isSelected: isSelected,
+                                      onTap: () {
+                                        if (isSelected) {
+                                          // If already selected, show details
+                                          _showSsdDetails(ssd);
+                                        } else if (widget.isBuilderMode) {
+                                          // Only allow selection in builder mode
+                                          _selectSsd(ssd);
+                                          
+                                          // Show confirmation dialog and automatically proceed to next step
+                                          showDialog(
+                                            context: context,
+                                            barrierDismissible: false,
+                                            builder: (context) => AlertDialog(
+                                              title: const Text('Storage Selected'),
+                                              content: Text('${ssd.ssdName} has been added to your build.'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                    // Find the parent PcBuilderScreen and call its nextStep method
+                                                    final ancestor = context.findAncestorStateOfType<PcBuilderScreenState>();
+                                                    if (ancestor != null) {
+                                                      ancestor.nextStep();
+                                                    }
+                                                  },
+                                                  child: const Text('NEXT'),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        } else {
+                                          // In browse mode, just show details instead of selecting
+                                          _showSsdDetails(ssd);
+                                        }
+                                      },
+                                    );
+                                  },
+                                ),
                               ),
 
                               // Pagination

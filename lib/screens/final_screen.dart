@@ -563,6 +563,9 @@ class FinalScreen extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () async {
+              // Close the name dialog first
+              Navigator.of(context).pop();
+
               final String buildName = nameController.text.trim().isNotEmpty
                   ? nameController.text.trim()
                   : 'My PC Build';
@@ -580,54 +583,66 @@ class FinalScreen extends StatelessWidget {
                 totalPrice: totalPrice,
               );
 
-              Navigator.of(context).pop();
-
               // Show loading indicator
+              BuildContext? dialogContext;
               showDialog(
                 context: context,
                 barrierDismissible: false,
-                builder: (context) => const AlertDialog(
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      CircularProgressIndicator(),
-                      SizedBox(height: 16),
-                      Text('Saving your build...'),
-                    ],
-                  ),
-                ),
+                builder: (context) {
+                  dialogContext = context; // Store the dialog's context
+                  return const AlertDialog(
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(height: 16),
+                        Text('Saving your build...'),
+                      ],
+                    ),
+                  );
+                },
               );
 
+              bool success = false;
+              
               // Save the build
-              final success =
-                  await Provider.of<BuildProvider>(context, listen: false)
-                      .saveBuild(build);
-
-              // Close loading dialog
-              Navigator.of(context).pop();
+              try {
+                success = await Provider.of<BuildProvider>(context, listen: false)
+                    .saveBuild(build);
+              } catch (e) {
+                debugPrint('Error saving build: $e');
+                success = false;
+              } finally {
+                // Close the loading dialog using its specific context
+                if (dialogContext != null && Navigator.canPop(dialogContext!)) {
+                  Navigator.pop(dialogContext!);
+                }
+              }
 
               // Show result
-              if (success) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Build "$buildName" saved successfully'),
-                    backgroundColor: Colors.green,
-                    action: SnackBarAction(
-                      label: 'View Builds',
-                      onPressed: () {
-                        context.go('/builds');
-                      },
-                      textColor: Colors.white,
+              if (context.mounted) {
+                if (success) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Build "$buildName" saved successfully'),
+                      backgroundColor: Colors.green,
+                      action: SnackBarAction(
+                        label: 'View Builds',
+                        onPressed: () {
+                          context.go('/builds');
+                        },
+                        textColor: Colors.white,
+                      ),
                     ),
-                  ),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Failed to save build'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Failed to save build'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               }
             },
             child: const Text('Save'),

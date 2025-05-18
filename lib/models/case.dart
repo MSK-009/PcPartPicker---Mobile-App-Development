@@ -2,16 +2,16 @@ class Case {
   final String id;
   final String image;
   final String caseName;
-  final String type;
-  final String color;
+  final String size;
+  final String isolation;
   final String price;
 
   Case({
     required this.id,
     required this.image,
     required this.caseName,
-    required this.type,
-    required this.color,
+    required this.size,
+    required this.isolation,
     required this.price,
   });
 
@@ -19,10 +19,10 @@ class Case {
     return Case(
       id: json['_id'] ?? '',
       image: json['Image'] ?? '',
-      caseName: json['CASE_name'] ?? '',
-      type: json['Type'] ?? '',
-      color: json['Color'] ?? '',
-      price: json['Price'] ?? '',
+      caseName: json['Case_name'] ?? '',
+      size: json['Size'] ?? '',
+      isolation: json['Isolation'] ?? '',
+      price: json['Price'] ?? 'Not Available',
     );
   }
 
@@ -30,9 +30,9 @@ class Case {
     return {
       '_id': id,
       'Image': image,
-      'CASE_name': caseName,
-      'Type': type,
-      'Color': color,
+      'Case_name': caseName,
+      'Size': size,
+      'Isolation': isolation,
       'Price': price,
     };
   }

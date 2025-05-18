@@ -255,21 +255,21 @@ class _RamScreenState extends State<RamScreen> {
                           child: Column(
                             children: [
                               // Grid of RAM Cards
-                              AlignedGridView.count(
-                                crossAxisCount: 2,
-                                mainAxisSpacing: 16,
-                                crossAxisSpacing: 16,
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: rams.length,
-                                itemBuilder: (context, index) {
-                                  final ram = rams[index];
-                                  final isSelected =
-                                      listProvider.selectedRam?.id == ram.id;
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                                child: AlignedGridView.count(
+                                  crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
+                                  mainAxisSpacing: 12,
+                                  crossAxisSpacing: 12,
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: rams.length,
+                                  itemBuilder: (context, index) {
+                                    final ram = rams[index];
+                                    final isSelected =
+                                        listProvider.selectedRam?.id == ram.id;
 
-                                  return SizedBox(
-                                    height: 280, // Fixed height for each card
-                                    child: ComponentCard(
+                                    return ComponentCard(
                                       image: ram.image,
                                       name: ram.ramName,
                                       price: ram.price,
@@ -309,9 +309,9 @@ class _RamScreenState extends State<RamScreen> {
                                           _showRamDetails(ram);
                                         }
                                       },
-                                    ),
-                                  );
-                                },
+                                    );
+                                  },
+                                ),
                               ),
 
                               // Pagination

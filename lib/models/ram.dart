@@ -24,7 +24,7 @@ class Ram {
       id: json['_id'] ?? '',
       image: json['Image'] ?? '',
       ramName: json['RAM_name'] ?? '',
-      price: json['Price'] ?? '',
+      price: json['Price'] ?? 'Not Available',
       released: json['Released'] ?? '',
       latency: json['Latency'] ?? '',
       multicore: json['Multicore_RW'] ?? '',
