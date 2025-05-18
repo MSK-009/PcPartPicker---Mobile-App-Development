@@ -118,8 +118,8 @@ class _CasesScreenState extends State<CasesScreen> {
         title: caseItem.caseName,
         imageUrl: caseItem.image,
         details: [
-          {'label': 'Type', 'value': caseItem.type},
-          {'label': 'Color', 'value': caseItem.color},
+          {'label': 'Size', 'value': caseItem.size},
+          {'label': 'Isolation', 'value': caseItem.isolation},
           {'label': 'Price', 'value': caseItem.price},
         ],
         onRemove: isSelected ? () => listProvider.removeCase() : null,
@@ -254,61 +254,64 @@ class _CasesScreenState extends State<CasesScreen> {
                           child: Column(
                             children: [
                               // Grid of Case Cards
-                              AlignedGridView.count(
-                                crossAxisCount: 2,
-                                mainAxisSpacing: 16,
-                                crossAxisSpacing: 16,
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: cases.length,
-                                itemBuilder: (context, index) {
-                                  final caseItem = cases[index];
-                                  final isSelected =
-                                      listProvider.selectedCase?.id ==
-                                          caseItem.id;
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                                child: AlignedGridView.count(
+                                  crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
+                                  mainAxisSpacing: 12,
+                                  crossAxisSpacing: 12,
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: cases.length,
+                                  itemBuilder: (context, index) {
+                                    final caseItem = cases[index];
+                                    final isSelected =
+                                        listProvider.selectedCase?.id ==
+                                            caseItem.id;
 
-                                  return ComponentCard(
-                                    image: caseItem.image,
-                                    name: caseItem.caseName,
-                                    price: caseItem.price,
-                                    isSelected: isSelected,
-                                    onTap: () {
-                                      if (isSelected) {
-                                        // If already selected, show details
-                                        _showCaseDetails(caseItem);
-                                      } else if (widget.isBuilderMode) {
-                                        // Only allow selection in builder mode
-                                        _selectCase(caseItem);
-                                        
-                                        // Show confirmation dialog and automatically proceed to next step
-                                        showDialog(
-                                          context: context,
-                                          barrierDismissible: false,
-                                          builder: (context) => AlertDialog(
-                                            title: const Text('Case Selected'),
-                                            content: Text('${caseItem.caseName} has been added to your build.'),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();
-                                                  // Find the parent PcBuilderScreen and call its nextStep method
-                                                  final ancestor = context.findAncestorStateOfType<PcBuilderScreenState>();
-                                                  if (ancestor != null) {
-                                                    ancestor.nextStep();
-                                                  }
-                                                },
-                                                child: const Text('NEXT'),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      } else {
-                                        // In browse mode, just show details instead of selecting
-                                        _showCaseDetails(caseItem);
-                                      }
-                                    },
-                                  );
-                                },
+                                    return ComponentCard(
+                                      image: caseItem.image,
+                                      name: caseItem.caseName,
+                                      price: caseItem.price,
+                                      isSelected: isSelected,
+                                      onTap: () {
+                                        if (isSelected) {
+                                          // If already selected, show details
+                                          _showCaseDetails(caseItem);
+                                        } else if (widget.isBuilderMode) {
+                                          // Only allow selection in builder mode
+                                          _selectCase(caseItem);
+                                          
+                                          // Show confirmation dialog and automatically proceed to next step
+                                          showDialog(
+                                            context: context,
+                                            barrierDismissible: false,
+                                            builder: (context) => AlertDialog(
+                                              title: const Text('Case Selected'),
+                                              content: Text('${caseItem.caseName} has been added to your build.'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                    // Find the parent PcBuilderScreen and call its nextStep method
+                                                    final ancestor = context.findAncestorStateOfType<PcBuilderScreenState>();
+                                                    if (ancestor != null) {
+                                                      ancestor.nextStep();
+                                                    }
+                                                  },
+                                                  child: const Text('NEXT'),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        } else {
+                                          // In browse mode, just show details instead of selecting
+                                          _showCaseDetails(caseItem);
+                                        }
+                                      },
+                                    );
+                                  },
+                                ),
                               ),
 
                               // Pagination

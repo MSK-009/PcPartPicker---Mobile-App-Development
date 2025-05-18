@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:pc_part_picker/models/processor.dart';
 import 'package:pc_part_picker/models/gpu.dart';
 import 'package:pc_part_picker/models/motherboard.dart';
@@ -34,23 +35,166 @@ class Build {
   });
 
   factory Build.fromJson(Map<String, dynamic> json) {
+    // Handle processor field - could be a Map or just an ID string
+    Processor? processorObj;
+    if (json['processor'] != null) {
+      if (json['processor'] is Map<String, dynamic>) {
+        processorObj = Processor.fromJson(json['processor']);
+      } else {
+        // If it's just an ID string, create a minimal Processor with just the ID
+        processorObj = Processor(
+          id: json['processor'].toString(),
+          image: '',
+          cpuName: 'Loading...',
+          cores: '',
+          threads: '',
+          baseClock: '',
+          turboClock: '',
+          tdp: '',
+          released: '',
+          price: '',
+        );
+      }
+    }
+
+    // Handle GPU field
+    Gpu? gpuObj;
+    if (json['gpu'] != null) {
+      if (json['gpu'] is Map<String, dynamic>) {
+        gpuObj = Gpu.fromJson(json['gpu']);
+      } else {
+        gpuObj = Gpu(
+          id: json['gpu'].toString(),
+          image: '',
+          gpuName: 'Loading...',
+          series: '',
+          tdp: '',
+          memory: '',
+          released: '',
+          manufacturer: '',
+          price: '',
+        );
+      }
+    }
+
+    // Handle motherboard field
+    Motherboard? motherboardObj;
+    if (json['motherboard'] != null) {
+      if (json['motherboard'] is Map<String, dynamic>) {
+        motherboardObj = Motherboard.fromJson(json['motherboard']);
+      } else {
+        motherboardObj = Motherboard(
+          id: json['motherboard'].toString(),
+          image: '',
+          chipset: 'Loading...',
+          socket: '',
+          formFactor: '',
+          memorySlots: '',
+          memoryType: '',
+          manufacturer: '',
+          price: '',
+        );
+      }
+    }
+
+    // Handle RAM field
+    Ram? ramObj;
+    if (json['ram'] != null) {
+      if (json['ram'] is Map<String, dynamic>) {
+        ramObj = Ram.fromJson(json['ram']);
+      } else {
+        ramObj = Ram(
+          id: json['ram'].toString(),
+          image: '',
+          ramName: 'Loading...',
+          latency: '',
+          multicore: '',
+          singlecore: '',
+          released: '',
+          price: '',
+        );
+      }
+    }
+
+    // Handle SSD field
+    Ssd? ssdObj;
+    if (json['ssd'] != null) {
+      if (json['ssd'] is Map<String, dynamic>) {
+        ssdObj = Ssd.fromJson(json['ssd']);
+      } else {
+        ssdObj = Ssd(
+          id: json['ssd'].toString(),
+          image: '',
+          ssdName: 'Loading...',
+          capacity: '',
+          format: '',
+          protocol: '',
+          released: '',
+          price: '',
+        );
+      }
+    }
+
+    // Handle Case field
+    Case? caseObj;
+    if (json['case'] != null) {
+      if (json['case'] is Map<String, dynamic>) {
+        caseObj = Case.fromJson(json['case']);
+      } else {
+        caseObj = Case(
+          id: json['case'].toString(),
+          image: '',
+          caseName: 'Loading...',
+          size: '',
+          isolation: '',
+          price: '',
+        );
+      }
+    }
+
+    // Handle PSU field
+    Psu? psuObj;
+    if (json['psu'] != null) {
+      if (json['psu'] is Map<String, dynamic>) {
+        psuObj = Psu.fromJson(json['psu']);
+      } else {
+        psuObj = Psu(
+          id: json['psu'].toString(),
+          image: '',
+          psuName: 'Loading...',
+          wattage: '',
+          size: '',
+          price: '',
+        );
+      }
+    }
+
     return Build(
       id: json['_id'],
       name: json['name'] ?? 'Unnamed Build',
-      processor: json['processor'] != null ? Processor.fromJson(json['processor']) : null,
-      gpu: json['gpu'] != null ? Gpu.fromJson(json['gpu']) : null,
-      motherboard: json['motherboard'] != null ? Motherboard.fromJson(json['motherboard']) : null,
-      ram: json['ram'] != null ? Ram.fromJson(json['ram']) : null,
-      ssd: json['ssd'] != null ? Ssd.fromJson(json['ssd']) : null,
-      pcCase: json['case'] != null ? Case.fromJson(json['case']) : null,
-      psu: json['psu'] != null ? Psu.fromJson(json['psu']) : null,
+      processor: processorObj,
+      gpu: gpuObj,
+      motherboard: motherboardObj,
+      ram: ramObj,
+      ssd: ssdObj,
+      pcCase: caseObj,
+      psu: psuObj,
       totalPrice: json['totalPrice']?.toDouble() ?? 0.0,
       date: json['date'],
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
+    // Debug information
+    debugPrint('Processor ID: ${processor?.id}');
+    debugPrint('GPU ID: ${gpu?.id}');
+    debugPrint('Motherboard ID: ${motherboard?.id}');
+    debugPrint('RAM ID: ${ram?.id}');
+    debugPrint('SSD ID: ${ssd?.id}');
+    debugPrint('Case ID: ${pcCase?.id}');
+    debugPrint('PSU ID: ${psu?.id}');
+    
+    final json = {
       'name': name,
       'processor': processor?.id,
       'gpu': gpu?.id,
@@ -61,5 +205,10 @@ class Build {
       'psu': psu?.id,
       'totalPrice': totalPrice,
     };
+    
+    // Remove null values that could cause issues with the backend
+    json.removeWhere((key, value) => value == null);
+    
+    return json;
   }
 } 

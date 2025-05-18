@@ -23,7 +23,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       leading: showBackButton ? IconButton(
         icon: const Icon(Icons.arrow_back),
         onPressed: () {
-          Navigator.of(context).pop();
+          if (Navigator.of(context).canPop()) {
+            Navigator.of(context).pop();
+          } else {
+            context.go('/');
+          }
         },
       ) : null,
       title: Row(
@@ -35,30 +39,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       actions: showActions
           ? [
-              IconButton(
-                icon: const Icon(Icons.home),
-                tooltip: 'Go to Home',
-                onPressed: () {
-                  context.go('/');
-                },
-              ),
-              TextButton.icon(
-                icon: const Icon(Icons.computer, color: Colors.white),
-                label: const Text(
-                  'BUILD PC',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                onPressed: () {
-                  context.go('/pc-builder');
-                },
-                style: TextButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                ),
-              ),
               Stack(
                 alignment: Alignment.center,
                 children: [

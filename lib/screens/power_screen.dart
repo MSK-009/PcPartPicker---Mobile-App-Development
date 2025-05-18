@@ -253,60 +253,63 @@ class _PowerScreenState extends State<PowerScreen> {
                           child: Column(
                             children: [
                               // Grid of PSU Cards
-                              AlignedGridView.count(
-                                crossAxisCount: 2,
-                                mainAxisSpacing: 16,
-                                crossAxisSpacing: 16,
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: psus.length,
-                                itemBuilder: (context, index) {
-                                  final psu = psus[index];
-                                  final isSelected =
-                                      listProvider.selectedPsu?.id == psu.id;
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                                child: AlignedGridView.count(
+                                  crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
+                                  mainAxisSpacing: 12,
+                                  crossAxisSpacing: 12,
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: psus.length,
+                                  itemBuilder: (context, index) {
+                                    final psu = psus[index];
+                                    final isSelected =
+                                        listProvider.selectedPsu?.id == psu.id;
 
-                                  return ComponentCard(
-                                    image: psu.image,
-                                    name: psu.psuName,
-                                    price: psu.price,
-                                    isSelected: isSelected,
-                                    onTap: () {
-                                      if (isSelected) {
-                                        // If already selected, show details
-                                        _showPsuDetails(psu);
-                                      } else if (widget.isBuilderMode) {
-                                        // Only allow selection in builder mode
-                                        _selectPsu(psu);
-                                        
-                                        // Show confirmation dialog and automatically proceed to next step
-                                        showDialog(
-                                          context: context,
-                                          barrierDismissible: false,
-                                          builder: (context) => AlertDialog(
-                                            title: const Text('Power Supply Selected'),
-                                            content: Text('${psu.psuName} has been added to your build.'),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();
-                                                  // Find the parent PcBuilderScreen and call its nextStep method
-                                                  final ancestor = context.findAncestorStateOfType<PcBuilderScreenState>();
-                                                  if (ancestor != null) {
-                                                    ancestor.nextStep();
-                                                  }
-                                                },
-                                                child: const Text('NEXT'),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      } else {
-                                        // In browse mode, just show details instead of selecting
-                                        _showPsuDetails(psu);
-                                      }
-                                    },
-                                  );
-                                },
+                                    return ComponentCard(
+                                      image: psu.image,
+                                      name: psu.psuName,
+                                      price: psu.price,
+                                      isSelected: isSelected,
+                                      onTap: () {
+                                        if (isSelected) {
+                                          // If already selected, show details
+                                          _showPsuDetails(psu);
+                                        } else if (widget.isBuilderMode) {
+                                          // Only allow selection in builder mode
+                                          _selectPsu(psu);
+                                          
+                                          // Show confirmation dialog and automatically proceed to next step
+                                          showDialog(
+                                            context: context,
+                                            barrierDismissible: false,
+                                            builder: (context) => AlertDialog(
+                                              title: const Text('Power Supply Selected'),
+                                              content: Text('${psu.psuName} has been added to your build.'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                    // Find the parent PcBuilderScreen and call its nextStep method
+                                                    final ancestor = context.findAncestorStateOfType<PcBuilderScreenState>();
+                                                    if (ancestor != null) {
+                                                      ancestor.nextStep();
+                                                    }
+                                                  },
+                                                  child: const Text('NEXT'),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        } else {
+                                          // In browse mode, just show details instead of selecting
+                                          _showPsuDetails(psu);
+                                        }
+                                      },
+                                    );
+                                  },
+                                ),
                               ),
 
                               // Pagination

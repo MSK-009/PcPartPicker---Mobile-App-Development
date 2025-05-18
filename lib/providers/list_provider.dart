@@ -43,34 +43,53 @@ class ListProvider extends ChangeNotifier {
     double total = 0;
     
     if (_selectedProcessor != null) {
-      total += double.tryParse(_selectedProcessor!.price.replaceAll('\$', '').replaceAll(',', '')) ?? 0;
+      total += _extractPrice(_selectedProcessor!.price);
     }
     
     if (_selectedGpu != null) {
-      total += double.tryParse(_selectedGpu!.price.replaceAll('\$', '').replaceAll(',', '')) ?? 0;
+      total += _extractPrice(_selectedGpu!.price);
     }
     
     if (_selectedMotherboard != null) {
-      total += double.tryParse(_selectedMotherboard!.price.replaceAll('\$', '').replaceAll(',', '')) ?? 0;
+      total += _extractPrice(_selectedMotherboard!.price);
     }
     
     if (_selectedRam != null) {
-      total += double.tryParse(_selectedRam!.price.replaceAll('\$', '').replaceAll(',', '')) ?? 0;
+      total += _extractPrice(_selectedRam!.price);
     }
     
     if (_selectedSsd != null) {
-      total += double.tryParse(_selectedSsd!.price.replaceAll('\$', '').replaceAll(',', '')) ?? 0;
+      total += _extractPrice(_selectedSsd!.price);
     }
     
     if (_selectedCase != null) {
-      total += double.tryParse(_selectedCase!.price.replaceAll('\$', '').replaceAll(',', '')) ?? 0;
+      total += _extractPrice(_selectedCase!.price);
     }
     
     if (_selectedPsu != null) {
-      total += double.tryParse(_selectedPsu!.price.replaceAll('\$', '').replaceAll(',', '')) ?? 0;
+      total += _extractPrice(_selectedPsu!.price);
     }
     
     return total;
+  }
+  
+  // Helper method to extract numeric price from various string formats
+  double _extractPrice(String priceStr) {
+    // Remove all currency symbols, spaces, and other non-numeric characters except dot
+    String numericStr = priceStr
+      .replaceAll(RegExp(r'[A-Za-z$£€¥]'), '') // Remove currency symbols and letters
+      .replaceAll(RegExp(r'\s+'), '')          // Remove spaces
+      .replaceAll(',', '.')                     // Replace comma with dot
+      .trim();
+    
+    // In case there are multiple dots, keep only the last one (as decimal separator)
+    final parts = numericStr.split('.');
+    if (parts.length > 2) {
+      numericStr = parts.sublist(0, parts.length - 1).join('') + '.' + parts.last;
+    }
+    
+    // Convert to double
+    return double.tryParse(numericStr) ?? 0.0;
   }
 
   void setProcessor(Processor processor) {

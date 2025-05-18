@@ -18,6 +18,7 @@ import 'package:pc_part_picker/screens/ssd_screen.dart';
 import 'package:pc_part_picker/screens/cases_screen.dart';
 import 'package:pc_part_picker/screens/power_screen.dart';
 import 'package:pc_part_picker/widgets/app_bar.dart';
+import 'package:pc_part_picker/providers/list_provider.dart';
 
 class PcBuilderScreen extends StatefulWidget {
   const PcBuilderScreen({Key? key}) : super(key: key);
@@ -104,16 +105,6 @@ class PcBuilderScreenState extends State<PcBuilderScreen> {
             context.go('/');
           },
         ),
-        actions: [
-          // Home button
-          IconButton(
-            icon: const Icon(Icons.home),
-            tooltip: 'Go to Home',
-            onPressed: () {
-              context.go('/');
-            },
-          ),
-        ],
       ),
       body: Column(
         children: [
@@ -157,7 +148,7 @@ class PcBuilderScreenState extends State<PcBuilderScreen> {
                 // Back button (left of screen)
                 if (_currentStep > 0)
                   Positioned(
-                    left: 20,
+                    left: 12,
                     top: 0,
                     bottom: 0,
                     child: Center(
@@ -165,14 +156,15 @@ class PcBuilderScreenState extends State<PcBuilderScreen> {
                         heroTag: 'prevButton',
                         onPressed: _previousStep,
                         backgroundColor: Colors.grey[700],
-                        child: const Icon(Icons.arrow_back, size: 36),
+                        elevation: 6.0,
+                        child: const Icon(Icons.arrow_back, size: 36, color: Colors.white),
                       ),
                     ),
                   ),
                 
                 // Next button (right of screen)
                 Positioned(
-                  right: 20,
+                  right: 12,
                   top: 0,
                   bottom: 0,
                   child: Center(
@@ -180,11 +172,13 @@ class PcBuilderScreenState extends State<PcBuilderScreen> {
                       heroTag: 'nextButton',
                       onPressed: nextStep,
                       backgroundColor: Theme.of(context).primaryColor,
+                      elevation: 6.0,
                       child: Icon(
                         _currentStep < _buildSteps.length - 1 
                             ? Icons.arrow_forward 
                             : Icons.check,
                         size: 36,
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -197,46 +191,17 @@ class PcBuilderScreenState extends State<PcBuilderScreen> {
           Container(
             color: Colors.grey[200],
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Previous button
-                ElevatedButton.icon(
-                  onPressed: _currentStep > 0 ? _previousStep : null,
-                  icon: const Icon(Icons.arrow_back),
-                  label: const Text('PREVIOUS'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey[700],
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    disabledBackgroundColor: Colors.grey[400],
-                  ),
+            child: Center(
+              child: ElevatedButton.icon(
+                onPressed: () => _showBuildSummary(context, currentBuild),
+                icon: const Icon(Icons.list),
+                label: const Text('VIEW BUILD'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 ),
-                
-                // Build summary button
-                ElevatedButton.icon(
-                  onPressed: () => _showBuildSummary(context, currentBuild),
-                  icon: const Icon(Icons.list),
-                  label: const Text('VIEW BUILD'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  ),
-                ),
-                
-                // Next button
-                ElevatedButton.icon(
-                  onPressed: nextStep,
-                  icon: Icon(_currentStep < _buildSteps.length - 1 ? Icons.arrow_forward : Icons.check),
-                  label: Text(_currentStep < _buildSteps.length - 1 ? 'NEXT' : 'FINISH'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).primaryColor,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ],
@@ -246,38 +211,37 @@ class PcBuilderScreenState extends State<PcBuilderScreen> {
   
   // Show a dialog with the current build summary
   void _showBuildSummary(BuildContext context, Build? build) {
+    final listProvider = Provider.of<ListProvider>(context, listen: false);
+    
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        double totalPrice = 0;
-        
-        if (build != null) {
-          if (build.processor != null) totalPrice += double.tryParse(build.processor!.price) ?? 0;
-          if (build.gpu != null) totalPrice += double.tryParse(build.gpu!.price) ?? 0;
-          if (build.motherboard != null) totalPrice += double.tryParse(build.motherboard!.price) ?? 0;
-          if (build.ram != null) totalPrice += double.tryParse(build.ram!.price) ?? 0;
-          if (build.ssd != null) totalPrice += double.tryParse(build.ssd!.price) ?? 0;
-          if (build.pcCase != null) totalPrice += double.tryParse(build.pcCase!.price) ?? 0;
-          if (build.psu != null) totalPrice += double.tryParse(build.psu!.price) ?? 0;
-        }
+        // Use the ListProvider's totalPrice calculation which now properly handles all formats
+        double totalPrice = listProvider.totalPrice;
         
         return AlertDialog(
-          title: const Text('Current Build'),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildSummaryItem('Processor', build?.processor?.cpuName ?? 'Not selected'),
-                _buildSummaryItem('Graphics Card', build?.gpu?.gpuName ?? 'Not selected'),
-                _buildSummaryItem('Motherboard', build?.motherboard?.manufacturer ?? 'Not selected'),
-                _buildSummaryItem('RAM', build?.ram?.ramName ?? 'Not selected'),
-                _buildSummaryItem('Storage', build?.ssd?.ssdName ?? 'Not selected'),
-                _buildSummaryItem('Case', build?.pcCase?.caseName ?? 'Not selected'),
-                _buildSummaryItem('Power Supply', build?.psu?.psuName ?? 'Not selected'),
-                const Divider(),
-                _buildSummaryItem('Total Price', '\$${totalPrice.toStringAsFixed(2)}', isTotal: true),
-              ],
+          title: const Text('Current Build', style: TextStyle(fontWeight: FontWeight.bold)),
+          contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          content: Container(
+            width: double.maxFinite,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildSummaryItem('Processor:', listProvider.selectedProcessor?.cpuName ?? 'Not selected'),
+                  _buildSummaryItem('Graphics Card:', listProvider.selectedGpu?.gpuName ?? 'Not selected'),
+                  _buildSummaryItem('Motherboard:', listProvider.selectedMotherboard?.chipset ?? 'Not selected'),
+                  _buildSummaryItem('RAM:', listProvider.selectedRam?.ramName ?? 'Not selected'),
+                  _buildSummaryItem('Storage:', listProvider.selectedSsd?.ssdName ?? 'Not selected'),
+                  _buildSummaryItem('Case:', listProvider.selectedCase?.caseName ?? 'Not selected'),
+                  _buildSummaryItem('Power Supply:', listProvider.selectedPsu?.psuName ?? 'Not selected'),
+                  const Divider(height: 24, thickness: 1),
+                  _buildSummaryItem('Total Price:', '\$${totalPrice.toStringAsFixed(2)}', isTotal: true),
+                  const SizedBox(height: 8),
+                ],
+              ),
             ),
           ),
           actions: [
@@ -296,24 +260,37 @@ class PcBuilderScreenState extends State<PcBuilderScreen> {
   // Helper method to build summary items
   Widget _buildSummaryItem(String label, String value, {bool isTotal = false}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: isTotal ? 18 : 16,
-              color: isTotal ? Theme.of(context).primaryColor : null,
+          // Left side - label
+          Expanded(
+            flex: 3,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: isTotal ? 18 : 16,
+                color: isTotal ? Theme.of(context).primaryColor : null,
+              ),
             ),
           ),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: isTotal ? 18 : 16,
-              fontWeight: isTotal ? FontWeight.bold : null,
-              color: isTotal ? Theme.of(context).primaryColor : null,
+          
+          // Right side - value
+          Expanded(
+            flex: 5,
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: isTotal ? 18 : 16,
+                fontWeight: isTotal ? FontWeight.bold : null,
+                color: isTotal ? Theme.of(context).primaryColor : null,
+              ),
+              textAlign: TextAlign.right,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],

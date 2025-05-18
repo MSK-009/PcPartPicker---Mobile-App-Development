@@ -334,6 +334,17 @@ class _ProcessorsScreenState extends State<ProcessorsScreen> {
               ),
             ),
 
+          // Search Field for builder mode
+          if (widget.isBuilderMode)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: SearchWidget(
+                searchTerm: _searchTerm,
+                onSearchChanged: _onSearchChanged,
+                hintText: 'Search processors...',
+              ),
+            ),
+
           // Main Content
           Expanded(
             child: _isLoading
@@ -349,61 +360,64 @@ class _ProcessorsScreenState extends State<ProcessorsScreen> {
                           child: Column(
                             children: [
                               // Grid of Processor Cards
-                              AlignedGridView.count(
-                                crossAxisCount: widget.isBuilderMode ? 2 : 2,
-                                mainAxisSpacing: 16,
-                                crossAxisSpacing: 16,
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: processors.length,
-                                itemBuilder: (context, index) {
-                                  final processor = processors[index];
-                                  final isSelected =
-                                      listProvider.selectedProcessor?.id ==
-                                          processor.id;
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                                child: AlignedGridView.count(
+                                  crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
+                                  mainAxisSpacing: 12,
+                                  crossAxisSpacing: 12,
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: processors.length,
+                                  itemBuilder: (context, index) {
+                                    final processor = processors[index];
+                                    final isSelected =
+                                        listProvider.selectedProcessor?.id ==
+                                            processor.id;
 
-                                  return ComponentCard(
-                                    image: processor.image,
-                                    name: processor.cpuName,
-                                    price: processor.price,
-                                    isSelected: isSelected,
-                                    onTap: () {
-                                      if (isSelected) {
-                                        // If already selected, show details
-                                        _showProcessorDetails(processor);
-                                      } else if (widget.isBuilderMode) {
-                                        // Only allow selection in builder mode
-                                        _selectProcessor(processor);
-                                        
-                                        // Show confirmation dialog and automatically proceed to next step
-                                        showDialog(
-                                          context: context,
-                                          barrierDismissible: false,
-                                          builder: (context) => AlertDialog(
-                                            title: const Text('Processor Selected'),
-                                            content: Text('${processor.cpuName} has been added to your build.'),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();
-                                                  // Find the parent PcBuilderScreen and call its nextStep method
-                                                  final ancestor = context.findAncestorStateOfType<PcBuilderScreenState>();
-                                                  if (ancestor != null) {
-                                                    ancestor.nextStep();
-                                                  }
-                                                },
-                                                child: const Text('NEXT'),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      } else {
-                                        // In browse mode, just show details instead of selecting
-                                        _showProcessorDetails(processor);
-                                      }
-                                    },
-                                  );
-                                },
+                                    return ComponentCard(
+                                      image: processor.image,
+                                      name: processor.cpuName,
+                                      price: processor.price,
+                                      isSelected: isSelected,
+                                      onTap: () {
+                                        if (isSelected) {
+                                          // If already selected, show details
+                                          _showProcessorDetails(processor);
+                                        } else if (widget.isBuilderMode) {
+                                          // Only allow selection in builder mode
+                                          _selectProcessor(processor);
+                                          
+                                          // Show confirmation dialog and automatically proceed to next step
+                                          showDialog(
+                                            context: context,
+                                            barrierDismissible: false,
+                                            builder: (context) => AlertDialog(
+                                              title: const Text('Processor Selected'),
+                                              content: Text('${processor.cpuName} has been added to your build.'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                    // Find the parent PcBuilderScreen and call its nextStep method
+                                                    final ancestor = context.findAncestorStateOfType<PcBuilderScreenState>();
+                                                    if (ancestor != null) {
+                                                      ancestor.nextStep();
+                                                    }
+                                                  },
+                                                  child: const Text('NEXT'),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        } else {
+                                          // In browse mode, just show details instead of selecting
+                                          _showProcessorDetails(processor);
+                                        }
+                                      },
+                                    );
+                                  },
+                                ),
                               ),
 
                               // Only show pagination in normal mode

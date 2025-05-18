@@ -3,7 +3,9 @@ class Ssd {
   final String image;
   final String ssdName;
   final String capacity;
-  final String interface;
+  final String format;
+  final String protocol;
+  final String released;
   final String price;
 
   Ssd({
@@ -11,7 +13,9 @@ class Ssd {
     required this.image,
     required this.ssdName,
     required this.capacity,
-    required this.interface,
+    required this.format,
+    required this.protocol,
+    required this.released,
     required this.price,
   });
 
@@ -21,7 +25,9 @@ class Ssd {
       image: json['Image'] ?? '',
       ssdName: json['SSD_name'] ?? '',
       capacity: json['Capacity'] ?? '',
-      interface: json['Interface'] ?? '',
+      format: json['Format'] ?? '',
+      protocol: json['Protocol'] ?? '',
+      released: json['Released'] ?? '',
       price: json['Price'] ?? '',
     );
   }
@@ -32,7 +38,9 @@ class Ssd {
       'Image': image,
       'SSD_name': ssdName,
       'Capacity': capacity,
-      'Interface': interface,
+      'Format': format,
+      'Protocol': protocol,
+      'Released': released,
       'Price': price,
     };
   }

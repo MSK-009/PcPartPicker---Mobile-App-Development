@@ -262,62 +262,65 @@ class _MotherboardScreenState extends State<MotherboardScreen> {
                           child: Column(
                             children: [
                               // Grid of Motherboard Cards
-                              AlignedGridView.count(
-                                crossAxisCount: 2,
-                                mainAxisSpacing: 16,
-                                crossAxisSpacing: 16,
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: motherboards.length,
-                                itemBuilder: (context, index) {
-                                  final motherboard = motherboards[index];
-                                  final isSelected =
-                                      listProvider.selectedMotherboard?.id ==
-                                          motherboard.id;
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                                child: AlignedGridView.count(
+                                  crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
+                                  mainAxisSpacing: 12,
+                                  crossAxisSpacing: 12,
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: motherboards.length,
+                                  itemBuilder: (context, index) {
+                                    final motherboard = motherboards[index];
+                                    final isSelected =
+                                        listProvider.selectedMotherboard?.id ==
+                                            motherboard.id;
 
-                                  return ComponentCard(
-                                    image: motherboard.image,
-                                    name:
-                                        '${motherboard.manufacturer} ${motherboard.chipset}',
-                                    price: '\$${motherboard.price}',
-                                    isSelected: isSelected,
-                                    onTap: () {
-                                      if (isSelected) {
-                                        // If already selected, show details
-                                        _showMotherboardDetails(motherboard);
-                                      } else if (widget.isBuilderMode) {
-                                        // Only allow selection in builder mode
-                                        _selectMotherboard(motherboard);
-                                        
-                                        // Show confirmation dialog and automatically proceed to next step
-                                        showDialog(
-                                          context: context,
-                                          barrierDismissible: false,
-                                          builder: (context) => AlertDialog(
-                                            title: const Text('Motherboard Selected'),
-                                            content: Text('${motherboard.manufacturer} ${motherboard.chipset} has been added to your build.'),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();
-                                                  // Find the parent PcBuilderScreen and call its nextStep method
-                                                  final ancestor = context.findAncestorStateOfType<PcBuilderScreenState>();
-                                                  if (ancestor != null) {
-                                                    ancestor.nextStep();
-                                                  }
-                                                },
-                                                child: const Text('NEXT'),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      } else {
-                                        // In browse mode, just show details instead of selecting
-                                        _showMotherboardDetails(motherboard);
-                                      }
-                                    },
-                                  );
-                                },
+                                    return ComponentCard(
+                                      image: motherboard.image,
+                                      name:
+                                          '${motherboard.manufacturer} ${motherboard.chipset}',
+                                      price: '\$${motherboard.price}',
+                                      isSelected: isSelected,
+                                      onTap: () {
+                                        if (isSelected) {
+                                          // If already selected, show details
+                                          _showMotherboardDetails(motherboard);
+                                        } else if (widget.isBuilderMode) {
+                                          // Only allow selection in builder mode
+                                          _selectMotherboard(motherboard);
+                                          
+                                          // Show confirmation dialog and automatically proceed to next step
+                                          showDialog(
+                                            context: context,
+                                            barrierDismissible: false,
+                                            builder: (context) => AlertDialog(
+                                              title: const Text('Motherboard Selected'),
+                                              content: Text('${motherboard.manufacturer} ${motherboard.chipset} has been added to your build.'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                    // Find the parent PcBuilderScreen and call its nextStep method
+                                                    final ancestor = context.findAncestorStateOfType<PcBuilderScreenState>();
+                                                    if (ancestor != null) {
+                                                      ancestor.nextStep();
+                                                    }
+                                                  },
+                                                  child: const Text('NEXT'),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        } else {
+                                          // In browse mode, just show details instead of selecting
+                                          _showMotherboardDetails(motherboard);
+                                        }
+                                      },
+                                    );
+                                  },
+                                ),
                               ),
 
                               // Pagination
