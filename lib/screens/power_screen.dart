@@ -25,11 +25,33 @@ class _PowerScreenState extends State<PowerScreen> {
   String _sortParameter = 'PSU_name';
   String _sortOrder = 'asc';
   bool _isLoading = false;
+  bool _showFooter = false;
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_handleScroll);
     Future.microtask(() => _loadPsus());
+  }
+
+  void _handleScroll() {
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
+
+    // Show footer when near bottom (e.g., within 200px)
+    if (currentScroll >= maxScroll - 200) {
+      if (!_showFooter) {
+        setState(() {
+          _showFooter = true;
+        });
+      }
+    } else {
+      if (_showFooter) {
+        setState(() {
+          _showFooter = false;
+        });
+      }
+    }
   }
 
   Future<void> _loadPsus() async {
@@ -260,14 +282,25 @@ class _PowerScreenState extends State<PowerScreen> {
                                 totalPages: totalPages,
                                 onPageChanged: _onPageChanged,
                               ),
+                              const SizedBox(height: 30),
+
+                              // 👇 Move footer here
+                              AnimatedSlide(
+                                offset: _showFooter
+                                    ? Offset.zero
+                                    : const Offset(0, 0.1),
+                                duration: const Duration(milliseconds: 300),
+                                child: AnimatedOpacity(
+                                  opacity: _showFooter ? 1.0 : 0.0,
+                                  duration: const Duration(milliseconds: 300),
+                                  child: const FooterWidget(),
+                                ),
+                              ),
                             ],
                           ),
                         ),
                       ),
-          ),
-
-          // Footer
-          const FooterWidget(),
+          )
         ],
       ),
     );

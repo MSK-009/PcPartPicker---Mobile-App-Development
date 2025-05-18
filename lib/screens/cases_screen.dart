@@ -25,11 +25,33 @@ class _CasesScreenState extends State<CasesScreen> {
   String _sortParameter = 'CASE_name';
   String _sortOrder = 'asc';
   bool _isLoading = false;
+  bool _showFooter = false;
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_handleScroll);
     Future.microtask(() => _loadCases());
+  }
+
+  void _handleScroll() {
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
+
+    // Show footer when near bottom (e.g., within 200px)
+    if (currentScroll >= maxScroll - 200) {
+      if (!_showFooter) {
+        setState(() {
+          _showFooter = true;
+        });
+      }
+    } else {
+      if (_showFooter) {
+        setState(() {
+          _showFooter = false;
+        });
+      }
+    }
   }
 
   Future<void> _loadCases() async {
@@ -234,8 +256,10 @@ class _CasesScreenState extends State<CasesScreen> {
                                 itemCount: cases.length,
                                 itemBuilder: (context, index) {
                                   final caseItem = cases[index];
-                                  final isSelected = listProvider.selectedCase?.id == caseItem.id;
-                                  
+                                  final isSelected =
+                                      listProvider.selectedCase?.id ==
+                                          caseItem.id;
+
                                   return ComponentCard(
                                     image: caseItem.image,
                                     name: caseItem.caseName,
@@ -251,7 +275,7 @@ class _CasesScreenState extends State<CasesScreen> {
                                   );
                                 },
                               ),
-                              
+
                               // Pagination
                               const SizedBox(height: 20),
                               PaginationControls(
@@ -259,30 +283,41 @@ class _CasesScreenState extends State<CasesScreen> {
                                 totalPages: totalPages,
                                 onPageChanged: _onPageChanged,
                               ),
+                              const SizedBox(height: 30),
+
+                              // 👇 Move footer here
+                              AnimatedSlide(
+                                offset: _showFooter
+                                    ? Offset.zero
+                                    : const Offset(0, 0.1),
+                                duration: const Duration(milliseconds: 300),
+                                child: AnimatedOpacity(
+                                  opacity: _showFooter ? 1.0 : 0.0,
+                                  duration: const Duration(milliseconds: 300),
+                                  child: const FooterWidget(),
+                                ),
+                              ),
                             ],
                           ),
                         ),
                       ),
-          ),
-          
-          // Footer
-          const FooterWidget(),
+          )
         ],
       ),
     );
   }
 
-  Widget _buildSortButton(String text, bool isSelected, VoidCallback onPressed) {
+  Widget _buildSortButton(
+      String text, bool isSelected, VoidCallback onPressed) {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: isSelected
-            ? Theme.of(context).primaryColor
-            : Colors.grey.shade200,
+        backgroundColor:
+            isSelected ? Theme.of(context).primaryColor : Colors.grey.shade200,
         foregroundColor: isSelected ? Colors.white : Colors.black,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       ),
       child: Text(text),
     );
   }
-} 
+}

@@ -24,7 +24,7 @@ class FooterWidget extends StatelessWidget {
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize: 20,
+                        fontSize: 15,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -36,52 +36,51 @@ class FooterWidget extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
                     Wrap(
-                      spacing: 12.0,
+                      spacing: 2.0,
                       children: [
-                        _socialButton(Icons.facebook, () => _launchUrl('https://facebook.com')),
-                        _socialButton(Icons.signal_cellular_alt, () => _launchUrl('https://twitter.com')),
-                        _socialButton(Icons.camera_alt, () => _launchUrl('https://instagram.com')),
+                        _socialButton(Icons.facebook,
+                            () => _launchUrl('https://facebook.com')),
+                        _socialButton(Icons.signal_cellular_alt,
+                            () => _launchUrl('https://twitter.com')),
+                        _socialButton(Icons.camera_alt,
+                            () => _launchUrl('https://instagram.com')),
                       ],
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 20),
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Quick Links',
+                      'Components',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                        fontSize: 15,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 10),
                     _footerLink('Home', () => context.go('/')),
                     _footerLink('Contact Us', () => context.go('/about')),
                     _footerLink('Processors', () => context.go('/processors')),
                     _footerLink('Graphics Cards', () => context.go('/gpu')),
-                    _footerLink('Motherboards', () => context.go('/motherboard')),
+                    _footerLink(
+                        'Motherboards', () => context.go('/motherboard')),
                   ],
                 ),
               ),
-              const SizedBox(width: 20),
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'More Components',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
+                    const SizedBox(
+                      height: 18,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 10),
                     _footerLink('Memory', () => context.go('/memory')),
                     _footerLink('Storage', () => context.go('/storage')),
                     _footerLink('Cases', () => context.go('/cases')),
@@ -92,7 +91,7 @@ class FooterWidget extends StatelessWidget {
               ),
             ],
           ),
-          const Divider(color: Colors.grey, height: 40),
+          const Divider(color: Colors.grey, height: 20),
           const Text(
             '© 2023 PC Part Picker. All rights reserved.',
             style: TextStyle(
@@ -107,13 +106,13 @@ class FooterWidget extends StatelessWidget {
 
   Widget _socialButton(IconData icon, VoidCallback onTap) {
     return Padding(
-      padding: const EdgeInsets.only(right: 12),
+      padding: const EdgeInsets.only(right: 0),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(20),
         child: Container(
-          width: 40,
-          height: 40,
+          width: 30,
+          height: 30,
           decoration: BoxDecoration(
             color: const Color(0xFF2FA44D),
             borderRadius: BorderRadius.circular(20),
@@ -150,4 +149,4 @@ class FooterWidget extends StatelessWidget {
       await launchUrl(uri);
     }
   }
-} 
+}

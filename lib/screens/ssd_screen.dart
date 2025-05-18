@@ -25,11 +25,33 @@ class _SsdScreenState extends State<SsdScreen> {
   String _sortParameter = 'SSD_name';
   String _sortOrder = 'asc';
   bool _isLoading = false;
+  bool _showFooter = false;
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_handleScroll);
     Future.microtask(() => _loadSsds());
+  }
+
+  void _handleScroll() {
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
+
+    // Show footer when near bottom (e.g., within 200px)
+    if (currentScroll >= maxScroll - 200) {
+      if (!_showFooter) {
+        setState(() {
+          _showFooter = true;
+        });
+      }
+    } else {
+      if (_showFooter) {
+        setState(() {
+          _showFooter = false;
+        });
+      }
+    }
   }
 
   Future<void> _loadSsds() async {
@@ -234,8 +256,9 @@ class _SsdScreenState extends State<SsdScreen> {
                                 itemCount: ssds.length,
                                 itemBuilder: (context, index) {
                                   final ssd = ssds[index];
-                                  final isSelected = listProvider.selectedSsd?.id == ssd.id;
-                                  
+                                  final isSelected =
+                                      listProvider.selectedSsd?.id == ssd.id;
+
                                   return ComponentCard(
                                     image: ssd.image,
                                     name: ssd.ssdName,
@@ -251,7 +274,7 @@ class _SsdScreenState extends State<SsdScreen> {
                                   );
                                 },
                               ),
-                              
+
                               // Pagination
                               const SizedBox(height: 20),
                               PaginationControls(
@@ -259,30 +282,41 @@ class _SsdScreenState extends State<SsdScreen> {
                                 totalPages: totalPages,
                                 onPageChanged: _onPageChanged,
                               ),
+                              const SizedBox(height: 30),
+
+                              // 👇 Move footer here
+                              AnimatedSlide(
+                                offset: _showFooter
+                                    ? Offset.zero
+                                    : const Offset(0, 0.1),
+                                duration: const Duration(milliseconds: 300),
+                                child: AnimatedOpacity(
+                                  opacity: _showFooter ? 1.0 : 0.0,
+                                  duration: const Duration(milliseconds: 300),
+                                  child: const FooterWidget(),
+                                ),
+                              ),
                             ],
                           ),
                         ),
                       ),
-          ),
-          
-          // Footer
-          const FooterWidget(),
+          )
         ],
       ),
     );
   }
 
-  Widget _buildSortButton(String text, bool isSelected, VoidCallback onPressed) {
+  Widget _buildSortButton(
+      String text, bool isSelected, VoidCallback onPressed) {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: isSelected
-            ? Theme.of(context).primaryColor
-            : Colors.grey.shade200,
+        backgroundColor:
+            isSelected ? Theme.of(context).primaryColor : Colors.grey.shade200,
         foregroundColor: isSelected ? Colors.white : Colors.black,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       ),
       child: Text(text),
     );
   }
-} 
+}

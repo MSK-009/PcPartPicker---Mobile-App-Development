@@ -28,141 +28,137 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 20),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 60, horizontal: 20),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                    // Text Content
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                        RichText(
+                          text: TextSpan(
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                            ),
                             children: [
-                              RichText(
-                                text: TextSpan(
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  children: [
-                                    const TextSpan(text: 'Welcome to '),
-                                    TextSpan(
-                                      text: 'PcPartPicker!',
-                                      style: TextStyle(
-                                        color: Theme.of(context).primaryColor,
-                                        fontStyle: FontStyle.italic,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                              const Text(
-                                'A place where you can build your own PC. That is truly yours.',
+                              const TextSpan(text: 'Welcome to '),
+                              TextSpan(
+                                text: 'PcPartPicker!',
                                 style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              const Text(
-                                'Choose the components that suit your needs and create a custom build tailored to your',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  AnimatedTextKit(
-                                    animatedTexts: [
-                                      TyperAnimatedText(
-                                        'gaming',
-                                        textStyle: const TextStyle(
-                                          color: Colors.red,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        speed: const Duration(milliseconds: 100),
-                                      ),
-                                      TyperAnimatedText(
-                                        'productivity',
-                                        textStyle: const TextStyle(
-                                          color: Colors.blue,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        speed: const Duration(milliseconds: 100),
-                                      ),
-                                      TyperAnimatedText(
-                                        'creative tasks',
-                                        textStyle: TextStyle(
-                                          color: Theme.of(context).primaryColor,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        speed: const Duration(milliseconds: 100),
-                                      ),
-                                    ],
-                                    repeatForever: true,
-                                  ),
-                                  const Text(
-                                    '.',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 30),
-                              ElevatedButton(
-                                onPressed: () => context.go('/processors'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Theme.of(context).primaryColor,
-                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                child: const Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      'Make Your Own PC',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    SizedBox(width: 8),
-                                    Icon(Icons.computer),
-                                  ],
+                                  color: Theme.of(context).primaryColor,
+                                  fontStyle: FontStyle.italic,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(width: 20),
-                        Expanded(
-                          child: Container(
-                            width: double.infinity,
-                            height: 300,
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade800,
-                              borderRadius: BorderRadius.circular(16),
+                        const SizedBox(height: 20),
+                        const Text(
+                          'A place where you can build your own PC. That is truly yours.',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Choose the components that suit your needs and create a custom build tailored to your',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            AnimatedTextKit(
+                              animatedTexts: [
+                                TyperAnimatedText(
+                                  'gaming',
+                                  textStyle: const TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  speed: const Duration(milliseconds: 100),
+                                ),
+                                TyperAnimatedText(
+                                  'productivity',
+                                  textStyle: const TextStyle(
+                                    color: Color.fromARGB(255, 5, 68, 119),
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  speed: const Duration(milliseconds: 100),
+                                ),
+                                TyperAnimatedText(
+                                  'creative tasks',
+                                  textStyle: TextStyle(
+                                    color: const Color.fromARGB(255, 4, 88, 7),
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  speed: const Duration(milliseconds: 100),
+                                ),
+                              ],
+                              repeatForever: true,
                             ),
-                            child: const Center(
-                              child: Icon(
-                                Icons.computer,
-                                size: 100,
-                                color: Colors.white54,
+                            const Text(
+                              '.',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
                               ),
                             ),
+                          ],
+                        ),
+                        const SizedBox(height: 30),
+                        ElevatedButton(
+                          onPressed: () => context.go('/processors'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).primaryColor,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Make Your Own PC',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(width: 3),
+                              Icon(Icons.computer),
+                            ],
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 40),
+                    // Image Content
+                    Container(
+                      width: double.infinity,
+                      height: 300,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade800,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.computer,
+                          size: 100,
+                          color: Colors.white54,
+                        ),
+                      ),
                     ),
                   ],
                 ),
