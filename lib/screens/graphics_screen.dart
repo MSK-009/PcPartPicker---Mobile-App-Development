@@ -4,15 +4,22 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:pc_part_picker/models/gpu.dart';
 import 'package:pc_part_picker/providers/gpu_provider.dart';
 import 'package:pc_part_picker/providers/list_provider.dart';
+import 'package:pc_part_picker/providers/build_provider.dart';
 import 'package:pc_part_picker/widgets/app_bar.dart';
 import 'package:pc_part_picker/widgets/search_widget.dart';
 import 'package:pc_part_picker/widgets/component_card.dart';
 import 'package:pc_part_picker/widgets/pagination_controls.dart';
 import 'package:pc_part_picker/widgets/component_details_dialog.dart';
 import 'package:pc_part_picker/widgets/footer_widget.dart';
+import 'package:pc_part_picker/screens/pc_builder_screen.dart';
 
 class GraphicsScreen extends StatefulWidget {
-  const GraphicsScreen({Key? key}) : super(key: key);
+  final bool isBuilderMode;
+  
+  const GraphicsScreen({
+    Key? key, 
+    this.isBuilderMode = false,
+  }) : super(key: key);
 
   @override
   State<GraphicsScreen> createState() => _GraphicsScreenState();
@@ -126,7 +133,31 @@ class _GraphicsScreenState extends State<GraphicsScreen> {
   }
 
   void _selectGpu(Gpu gpu) {
-    Provider.of<ListProvider>(context, listen: false).setGpu(gpu);
+    final listProvider = Provider.of<ListProvider>(context, listen: false);
+    
+    // Set the GPU in the ListProvider
+    listProvider.setGpu(gpu);
+    
+    // If in builder mode, also add it to the current build
+    if (widget.isBuilderMode) {
+      // Get the current build from BuildProvider
+      final buildProvider = Provider.of<BuildProvider>(context, listen: false);
+      
+      // Create a new build or update the existing one
+      final currentBuild = buildProvider.selectedBuild ?? 
+        (buildProvider.builds.isNotEmpty ? buildProvider.builds.first : null);
+      
+      if (currentBuild != null) {
+        // Update the build with the selected GPU
+        // This is a simplified example; you might need to adjust based on your Build model
+        final updatedBuild = currentBuild;
+        // You would update the GPU here
+        
+        // Update the selectedBuild in the provider
+        buildProvider.setSelectedBuild(updatedBuild);
+      }
+    }
+    
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('${gpu.gpuName} added to your build'),
@@ -166,73 +197,78 @@ class _GraphicsScreenState extends State<GraphicsScreen> {
     final totalResults = gpuProvider.totalResults;
     final totalPages = (totalResults / _pageSize).ceil();
 
-    return Scaffold(
-      appBar: const CustomAppBar(title: 'Graphics Cards'),
+    // In builder mode, we don't need to show the full app bar
+    final screenWidget = Scaffold(
+      appBar: widget.isBuilderMode ? null : const CustomAppBar(title: 'Graphics Cards'),
       body: Column(
         children: [
-          // Filter and Sort Section
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
-                  spreadRadius: 1,
-                  blurRadius: 2,
-                  offset: const Offset(0, 1),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                // Search Field
-                SearchWidget(
-                  searchTerm: _searchTerm,
-                  onSearchChanged: _onSearchChanged,
-                  hintText: 'Search graphics cards...',
-                ),
+          // Only show filter/sort in normal mode
+          if (!widget.isBuilderMode)
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 2,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  // Search Field
+                  SearchWidget(
+                    searchTerm: _searchTerm,
+                    onSearchChanged: _onSearchChanged,
+                    hintText: 'Search graphics cards...',
+                  ),
 
-                const SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
-                // Sort Options
-                Row(
-                  children: [
-                    const Text(
-                      'Sort by:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  // Sort Options - Make it scrollable to avoid overflow
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        const Text(
+                          'Sort by:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        _buildSortButton(
+                          'Price ↑',
+                          _sortParameter == 'Price' && _sortOrder == 'asc',
+                          () => _onSortChanged('Price', 'asc'),
+                        ),
+                        const SizedBox(width: 8),
+                        _buildSortButton(
+                          'Price ↓',
+                          _sortParameter == 'Price' && _sortOrder == 'desc',
+                          () => _onSortChanged('Price', 'desc'),
+                        ),
+                        const SizedBox(width: 8),
+                        _buildSortButton(
+                          'Name A-Z',
+                          _sortParameter == 'GPU_name' && _sortOrder == 'asc',
+                          () => _onSortChanged('GPU_name', 'asc'),
+                        ),
+                        const SizedBox(width: 8),
+                        _buildSortButton(
+                          'Name Z-A',
+                          _sortParameter == 'GPU_name' && _sortOrder == 'desc',
+                          () => _onSortChanged('GPU_name', 'desc'),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 8),
-                    _buildSortButton(
-                      'Price ↑',
-                      _sortParameter == 'Price' && _sortOrder == 'asc',
-                      () => _onSortChanged('Price', 'asc'),
-                    ),
-                    const SizedBox(width: 8),
-                    _buildSortButton(
-                      'Price ↓',
-                      _sortParameter == 'Price' && _sortOrder == 'desc',
-                      () => _onSortChanged('Price', 'desc'),
-                    ),
-                    const SizedBox(width: 8),
-                    _buildSortButton(
-                      'Name A-Z',
-                      _sortParameter == 'GPU_name' && _sortOrder == 'asc',
-                      () => _onSortChanged('GPU_name', 'asc'),
-                    ),
-                    const SizedBox(width: 8),
-                    _buildSortButton(
-                      'Name Z-A',
-                      _sortParameter == 'GPU_name' && _sortOrder == 'desc',
-                      () => _onSortChanged('GPU_name', 'desc'),
-                    ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
-          ),
 
           // Main Content
           Expanded(
@@ -270,9 +306,37 @@ class _GraphicsScreenState extends State<GraphicsScreen> {
                                       isSelected: isSelected,
                                       onTap: () {
                                         if (isSelected) {
+                                          // If already selected, show details
                                           _showGpuDetails(gpu);
-                                        } else {
+                                        } else if (widget.isBuilderMode) {
+                                          // Only allow selection in builder mode
                                           _selectGpu(gpu);
+                                          
+                                          // Show confirmation dialog and automatically proceed to next step
+                                          showDialog(
+                                            context: context,
+                                            barrierDismissible: false,
+                                            builder: (context) => AlertDialog(
+                                              title: const Text('Graphics Card Selected'),
+                                              content: Text('${gpu.gpuName} has been added to your build.'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                    // Find the parent PcBuilderScreen and call its nextStep method
+                                                    final ancestor = context.findAncestorStateOfType<PcBuilderScreenState>();
+                                                    if (ancestor != null) {
+                                                      ancestor.nextStep();
+                                                    }
+                                                  },
+                                                  child: const Text('NEXT'),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        } else {
+                                          // In browse mode, just show details instead of selecting
+                                          _showGpuDetails(gpu);
                                         }
                                       },
                                     ),
@@ -280,27 +344,30 @@ class _GraphicsScreenState extends State<GraphicsScreen> {
                                 },
                               ),
 
-                              // Pagination
-                              const SizedBox(height: 20),
-                              PaginationControls(
-                                currentPage: _page,
-                                totalPages: totalPages,
-                                onPageChanged: _onPageChanged,
-                              ),
-                              const SizedBox(height: 30),
-
-                              // 👇 Move footer here
-                              AnimatedSlide(
-                                offset: _showFooter
-                                    ? Offset.zero
-                                    : const Offset(0, 0.1),
-                                duration: const Duration(milliseconds: 300),
-                                child: AnimatedOpacity(
-                                  opacity: _showFooter ? 1.0 : 0.0,
-                                  duration: const Duration(milliseconds: 300),
-                                  child: const FooterWidget(),
+                              // Only show pagination in normal mode
+                              if (!widget.isBuilderMode) ...[
+                                const SizedBox(height: 20),
+                                PaginationControls(
+                                  currentPage: _page,
+                                  totalPages: totalPages,
+                                  onPageChanged: _onPageChanged,
                                 ),
-                              ),
+                                const SizedBox(height: 30),
+                              ],
+
+                              // Footer (only show if not in builder mode)
+                              if (!widget.isBuilderMode)
+                                AnimatedSlide(
+                                  offset: _showFooter
+                                      ? Offset.zero
+                                      : const Offset(0, 0.1),
+                                  duration: const Duration(milliseconds: 300),
+                                  child: AnimatedOpacity(
+                                    opacity: _showFooter ? 1.0 : 0.0,
+                                    duration: const Duration(milliseconds: 300),
+                                    child: const FooterWidget(),
+                                  ),
+                                ),
                             ],
                           ),
                         ),
@@ -309,6 +376,8 @@ class _GraphicsScreenState extends State<GraphicsScreen> {
         ],
       ),
     );
+
+    return screenWidget;
   }
 
   Widget _buildSortButton(

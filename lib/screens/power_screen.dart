@@ -10,9 +10,15 @@ import 'package:pc_part_picker/widgets/component_card.dart';
 import 'package:pc_part_picker/widgets/pagination_controls.dart';
 import 'package:pc_part_picker/widgets/component_details_dialog.dart';
 import 'package:pc_part_picker/widgets/footer_widget.dart';
+import 'package:pc_part_picker/screens/pc_builder_screen.dart';
 
 class PowerScreen extends StatefulWidget {
-  const PowerScreen({Key? key}) : super(key: key);
+  final bool isBuilderMode;
+  
+  const PowerScreen({
+    Key? key,
+    this.isBuilderMode = false,
+  }) : super(key: key);
 
   @override
   State<PowerScreen> createState() => _PowerScreenState();
@@ -164,8 +170,8 @@ class _PowerScreenState extends State<PowerScreen> {
     final totalResults = psuProvider.totalResults;
     final totalPages = (totalResults / _pageSize).ceil();
 
-    return Scaffold(
-      appBar: const CustomAppBar(title: 'Power Supplies'),
+    final screenWidget = Scaffold(
+      appBar: widget.isBuilderMode ? null : const CustomAppBar(title: 'Power Supplies'),
       body: Column(
         children: [
           // Filter and Sort Section
@@ -266,9 +272,37 @@ class _PowerScreenState extends State<PowerScreen> {
                                     isSelected: isSelected,
                                     onTap: () {
                                       if (isSelected) {
+                                        // If already selected, show details
                                         _showPsuDetails(psu);
-                                      } else {
+                                      } else if (widget.isBuilderMode) {
+                                        // Only allow selection in builder mode
                                         _selectPsu(psu);
+                                        
+                                        // Show confirmation dialog and automatically proceed to next step
+                                        showDialog(
+                                          context: context,
+                                          barrierDismissible: false,
+                                          builder: (context) => AlertDialog(
+                                            title: const Text('Power Supply Selected'),
+                                            content: Text('${psu.psuName} has been added to your build.'),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                  // Find the parent PcBuilderScreen and call its nextStep method
+                                                  final ancestor = context.findAncestorStateOfType<PcBuilderScreenState>();
+                                                  if (ancestor != null) {
+                                                    ancestor.nextStep();
+                                                  }
+                                                },
+                                                child: const Text('NEXT'),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      } else {
+                                        // In browse mode, just show details instead of selecting
+                                        _showPsuDetails(psu);
                                       }
                                     },
                                   );
@@ -284,18 +318,19 @@ class _PowerScreenState extends State<PowerScreen> {
                               ),
                               const SizedBox(height: 30),
 
-                              // 👇 Move footer here
-                              AnimatedSlide(
-                                offset: _showFooter
-                                    ? Offset.zero
-                                    : const Offset(0, 0.1),
-                                duration: const Duration(milliseconds: 300),
-                                child: AnimatedOpacity(
-                                  opacity: _showFooter ? 1.0 : 0.0,
+                              // Footer (only show if not in builder mode)
+                              if (!widget.isBuilderMode)
+                                AnimatedSlide(
+                                  offset: _showFooter
+                                      ? Offset.zero
+                                      : const Offset(0, 0.1),
                                   duration: const Duration(milliseconds: 300),
-                                  child: const FooterWidget(),
+                                  child: AnimatedOpacity(
+                                    opacity: _showFooter ? 1.0 : 0.0,
+                                    duration: const Duration(milliseconds: 300),
+                                    child: const FooterWidget(),
+                                  ),
                                 ),
-                              ),
                             ],
                           ),
                         ),
@@ -304,6 +339,8 @@ class _PowerScreenState extends State<PowerScreen> {
         ],
       ),
     );
+    
+    return screenWidget;
   }
 
   Widget _buildSortButton(

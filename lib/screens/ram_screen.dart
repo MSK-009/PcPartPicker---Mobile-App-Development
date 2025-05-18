@@ -10,9 +10,15 @@ import 'package:pc_part_picker/widgets/component_card.dart';
 import 'package:pc_part_picker/widgets/pagination_controls.dart';
 import 'package:pc_part_picker/widgets/component_details_dialog.dart';
 import 'package:pc_part_picker/widgets/footer_widget.dart';
+import 'package:pc_part_picker/screens/pc_builder_screen.dart';
 
 class RamScreen extends StatefulWidget {
-  const RamScreen({Key? key}) : super(key: key);
+  final bool isBuilderMode;
+  
+  const RamScreen({
+    Key? key,
+    this.isBuilderMode = false,
+  }) : super(key: key);
 
   @override
   State<RamScreen> createState() => _RamScreenState();
@@ -166,8 +172,8 @@ class _RamScreenState extends State<RamScreen> {
     final totalResults = ramProvider.totalResults;
     final totalPages = (totalResults / _pageSize).ceil();
 
-    return Scaffold(
-      appBar: const CustomAppBar(title: 'RAM'),
+    final screenWidget = Scaffold(
+      appBar: widget.isBuilderMode ? null : const CustomAppBar(title: 'RAM'),
       body: Column(
         children: [
           // Filter and Sort Section
@@ -270,9 +276,37 @@ class _RamScreenState extends State<RamScreen> {
                                       isSelected: isSelected,
                                       onTap: () {
                                         if (isSelected) {
+                                          // If already selected, show details
                                           _showRamDetails(ram);
-                                        } else {
+                                        } else if (widget.isBuilderMode) {
+                                          // Only allow selection in builder mode
                                           _selectRam(ram);
+                                          
+                                          // Show confirmation dialog and automatically proceed to next step
+                                          showDialog(
+                                            context: context,
+                                            barrierDismissible: false,
+                                            builder: (context) => AlertDialog(
+                                              title: const Text('RAM Selected'),
+                                              content: Text('${ram.ramName} has been added to your build.'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                    // Find the parent PcBuilderScreen and call its nextStep method
+                                                    final ancestor = context.findAncestorStateOfType<PcBuilderScreenState>();
+                                                    if (ancestor != null) {
+                                                      ancestor.nextStep();
+                                                    }
+                                                  },
+                                                  child: const Text('NEXT'),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        } else {
+                                          // In browse mode, just show details instead of selecting
+                                          _showRamDetails(ram);
                                         }
                                       },
                                     ),
@@ -289,18 +323,19 @@ class _RamScreenState extends State<RamScreen> {
                               ),
                               const SizedBox(height: 30),
 
-                              // 👇 Move footer here
-                              AnimatedSlide(
-                                offset: _showFooter
-                                    ? Offset.zero
-                                    : const Offset(0, 0.1),
-                                duration: const Duration(milliseconds: 300),
-                                child: AnimatedOpacity(
-                                  opacity: _showFooter ? 1.0 : 0.0,
+                              // Footer (only show if not in builder mode)
+                              if (!widget.isBuilderMode)
+                                AnimatedSlide(
+                                  offset: _showFooter
+                                      ? Offset.zero
+                                      : const Offset(0, 0.1),
                                   duration: const Duration(milliseconds: 300),
-                                  child: const FooterWidget(),
+                                  child: AnimatedOpacity(
+                                    opacity: _showFooter ? 1.0 : 0.0,
+                                    duration: const Duration(milliseconds: 300),
+                                    child: const FooterWidget(),
+                                  ),
                                 ),
-                              ),
                             ],
                           ),
                         ),
@@ -309,6 +344,8 @@ class _RamScreenState extends State<RamScreen> {
         ],
       ),
     );
+    
+    return screenWidget;
   }
 
   Widget _buildSortButton(

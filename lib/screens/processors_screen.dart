@@ -4,15 +4,23 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:pc_part_picker/models/processor.dart';
 import 'package:pc_part_picker/providers/processor_provider.dart';
 import 'package:pc_part_picker/providers/list_provider.dart';
+import 'package:pc_part_picker/providers/build_provider.dart';
 import 'package:pc_part_picker/widgets/app_bar.dart';
 import 'package:pc_part_picker/widgets/search_widget.dart';
 import 'package:pc_part_picker/widgets/component_card.dart';
 import 'package:pc_part_picker/widgets/pagination_controls.dart';
 import 'package:pc_part_picker/widgets/component_details_dialog.dart';
 import 'package:pc_part_picker/widgets/footer_widget.dart';
+import 'package:pc_part_picker/screens/pc_builder_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class ProcessorsScreen extends StatefulWidget {
-  const ProcessorsScreen({Key? key}) : super(key: key);
+  final bool isBuilderMode;
+  
+  const ProcessorsScreen({
+    Key? key, 
+    this.isBuilderMode = false,
+  }) : super(key: key);
 
   @override
   State<ProcessorsScreen> createState() => _ProcessorsScreenState();
@@ -127,7 +135,31 @@ class _ProcessorsScreenState extends State<ProcessorsScreen> {
   }
 
   void _selectProcessor(Processor processor) {
-    Provider.of<ListProvider>(context, listen: false).setProcessor(processor);
+    final listProvider = Provider.of<ListProvider>(context, listen: false);
+    
+    // Set the processor in the ListProvider
+    listProvider.setProcessor(processor);
+    
+    // If in builder mode, also add it to the current build
+    if (widget.isBuilderMode) {
+      // Get the current build from BuildProvider
+      final buildProvider = Provider.of<BuildProvider>(context, listen: false);
+      
+      // Create a new build or update the existing one
+      final currentBuild = buildProvider.selectedBuild ?? 
+        (buildProvider.builds.isNotEmpty ? buildProvider.builds.first : null);
+      
+      if (currentBuild != null) {
+        // Update the build with the selected processor
+        // This is a simplified example; you might need to adjust based on your Build model
+        final updatedBuild = currentBuild;
+        // You would update the processor here
+        
+        // Update the selectedBuild in the provider
+        buildProvider.setSelectedBuild(updatedBuild);
+      }
+    }
+    
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('${processor.cpuName} added to your build'),
@@ -168,73 +200,139 @@ class _ProcessorsScreenState extends State<ProcessorsScreen> {
     final totalResults = processorProvider.totalResults;
     final totalPages = (totalResults / _pageSize).ceil();
 
-    return Scaffold(
-      appBar: const CustomAppBar(title: 'Processors'),
+    // In builder mode, we don't need to show the full app bar
+    final screenWidget = Scaffold(
+      appBar: widget.isBuilderMode ? null : CustomAppBar(
+        title: 'Processors',
+      ),
       body: Column(
         children: [
-          // Filter and Sort Section
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
-                  spreadRadius: 1,
-                  blurRadius: 2,
-                  offset: const Offset(0, 1),
-                ),
-              ],
+          // Information banner for browse mode
+          if (!widget.isBuilderMode)
+            Container(
+              padding: const EdgeInsets.all(12),
+              color: Colors.blue.withOpacity(0.1),
+              width: double.infinity,
+              child: Row(
+                children: [
+                  const Icon(Icons.info, color: Colors.blue),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Browse Mode',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        const Text(
+                          'You can view component details here but to select components for your build, use the "BUILD PC" button in the app bar.',
+                          style: TextStyle(fontSize: 14),
+                        ),
+                      ],
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => context.go('/pc-builder'),
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text('BUILD PC'),
+                  ),
+                ],
+              ),
             ),
-            child: Column(
-              children: [
-                // Search Field
-                SearchWidget(
-                  searchTerm: _searchTerm,
-                  onSearchChanged: _onSearchChanged,
-                  hintText: 'Search processors...',
-                ),
+            
+          // Only show filter/sort in normal mode
+          if (!widget.isBuilderMode)
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 2,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  // Search Field
+                  SearchWidget(
+                    searchTerm: _searchTerm,
+                    onSearchChanged: _onSearchChanged,
+                    hintText: 'Search processors...',
+                  ),
 
-                const SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
-                // Sort Options
-                Row(
-                  children: [
-                    const Text(
-                      'Sort by:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  // Sort Options - Make it scrollable to avoid overflow
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        const Text(
+                          'Sort by:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        _buildSortButton(
+                          'Price ↑',
+                          _sortParameter == 'Price' && _sortOrder == 'asc',
+                          () => _onSortChanged('Price', 'asc'),
+                        ),
+                        const SizedBox(width: 8),
+                        _buildSortButton(
+                          'Price ↓',
+                          _sortParameter == 'Price' && _sortOrder == 'desc',
+                          () => _onSortChanged('Price', 'desc'),
+                        ),
+                        const SizedBox(width: 8),
+                        _buildSortButton(
+                          'Name A-Z',
+                          _sortParameter == 'CPU_name' && _sortOrder == 'asc',
+                          () => _onSortChanged('CPU_name', 'asc'),
+                        ),
+                        const SizedBox(width: 8),
+                        _buildSortButton(
+                          'Name Z-A',
+                          _sortParameter == 'CPU_name' && _sortOrder == 'desc',
+                          () => _onSortChanged('CPU_name', 'desc'),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 8),
-                    _buildSortButton(
-                      'Price ↑',
-                      _sortParameter == 'Price' && _sortOrder == 'asc',
-                      () => _onSortChanged('Price', 'asc'),
-                    ),
-                    const SizedBox(width: 8),
-                    _buildSortButton(
-                      'Price ↓',
-                      _sortParameter == 'Price' && _sortOrder == 'desc',
-                      () => _onSortChanged('Price', 'desc'),
-                    ),
-                    const SizedBox(width: 8),
-                    _buildSortButton(
-                      'Name A-Z',
-                      _sortParameter == 'CPU_name' && _sortOrder == 'asc',
-                      () => _onSortChanged('CPU_name', 'asc'),
-                    ),
-                    const SizedBox(width: 8),
-                    _buildSortButton(
-                      'Name Z-A',
-                      _sortParameter == 'CPU_name' && _sortOrder == 'desc',
-                      () => _onSortChanged('CPU_name', 'desc'),
-                    ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
-          ),
+
+          // Builder mode instructions
+          if (widget.isBuilderMode)
+            Container(
+              padding: const EdgeInsets.all(12),
+              color: Theme.of(context).primaryColor.withOpacity(0.1),
+              width: double.infinity,
+              child: Text(
+                'Select a processor for your build',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).primaryColor,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
 
           // Main Content
           Expanded(
@@ -252,7 +350,7 @@ class _ProcessorsScreenState extends State<ProcessorsScreen> {
                             children: [
                               // Grid of Processor Cards
                               AlignedGridView.count(
-                                crossAxisCount: 3,
+                                crossAxisCount: widget.isBuilderMode ? 2 : 3,
                                 mainAxisSpacing: 16,
                                 crossAxisSpacing: 16,
                                 shrinkWrap: true,
@@ -271,36 +369,67 @@ class _ProcessorsScreenState extends State<ProcessorsScreen> {
                                     isSelected: isSelected,
                                     onTap: () {
                                       if (isSelected) {
+                                        // If already selected, show details
                                         _showProcessorDetails(processor);
-                                      } else {
+                                      } else if (widget.isBuilderMode) {
+                                        // Only allow selection in builder mode
                                         _selectProcessor(processor);
+                                        
+                                        // Show confirmation dialog and automatically proceed to next step
+                                        showDialog(
+                                          context: context,
+                                          barrierDismissible: false,
+                                          builder: (context) => AlertDialog(
+                                            title: const Text('Processor Selected'),
+                                            content: Text('${processor.cpuName} has been added to your build.'),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                  // Find the parent PcBuilderScreen and call its nextStep method
+                                                  final ancestor = context.findAncestorStateOfType<PcBuilderScreenState>();
+                                                  if (ancestor != null) {
+                                                    ancestor.nextStep();
+                                                  }
+                                                },
+                                                child: const Text('NEXT'),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      } else {
+                                        // In browse mode, just show details instead of selecting
+                                        _showProcessorDetails(processor);
                                       }
                                     },
                                   );
                                 },
                               ),
 
-                              // Pagination
-                              const SizedBox(height: 20),
-                              PaginationControls(
-                                currentPage: _page,
-                                totalPages: totalPages,
-                                onPageChanged: _onPageChanged,
-                              ),
-                              const SizedBox(height: 30),
-
-                              // 👇 Move footer here
-                              AnimatedSlide(
-                                offset: _showFooter
-                                    ? Offset.zero
-                                    : const Offset(0, 0.1),
-                                duration: const Duration(milliseconds: 300),
-                                child: AnimatedOpacity(
-                                  opacity: _showFooter ? 1.0 : 0.0,
-                                  duration: const Duration(milliseconds: 300),
-                                  child: const FooterWidget(),
+                              // Only show pagination in normal mode
+                              if (!widget.isBuilderMode) ...[
+                                const SizedBox(height: 20),
+                                PaginationControls(
+                                  currentPage: _page,
+                                  totalPages: totalPages,
+                                  onPageChanged: _onPageChanged,
                                 ),
-                              ),
+                                const SizedBox(height: 30),
+                              ],
+
+                              // Footer (only show if not in builder mode)
+                              if (!widget.isBuilderMode)
+                                AnimatedSlide(
+                                  offset: _showFooter
+                                      ? Offset.zero
+                                      : const Offset(0, 0.1),
+                                  duration: const Duration(milliseconds: 300),
+                                  child: AnimatedOpacity(
+                                    opacity: _showFooter ? 1.0 : 0.0,
+                                    duration: const Duration(milliseconds: 300),
+                                    child: const FooterWidget(),
+                                  ),
+                                ),
                             ],
                           ),
                         ),
@@ -309,6 +438,8 @@ class _ProcessorsScreenState extends State<ProcessorsScreen> {
         ],
       ),
     );
+
+    return screenWidget;
   }
 
   Widget _buildSortButton(

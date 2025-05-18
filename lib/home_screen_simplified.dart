@@ -10,7 +10,25 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(title: 'PC Part Picker'),
+      appBar: CustomAppBar(
+        title: 'PC Part Picker',
+        actions: [
+          // Add PC Builder button to the app bar
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: ElevatedButton.icon(
+              onPressed: () => context.go('/pc-builder'),
+              icon: const Icon(Icons.build),
+              label: const Text('Build PC'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Theme.of(context).primaryColor,
+                elevation: 2,
+              ),
+            ),
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -118,7 +136,7 @@ class HomeScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 30),
                               ElevatedButton(
-                                onPressed: () => context.go('/processors'),
+                                onPressed: () => context.go('/pc-builder'),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Theme.of(context).primaryColor,
                                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -191,43 +209,36 @@ class HomeScreen extends StatelessWidget {
                         context,
                         'Processor',
                         Icons.memory,
-                        '/processors',
                       ),
                       _buildComponentTile(
                         context,
                         'Graphics Card',
                         Icons.videogame_asset,
-                        '/gpu',
                       ),
                       _buildComponentTile(
                         context,
                         'Motherboard',
                         Icons.dashboard,
-                        '/motherboard',
                       ),
                       _buildComponentTile(
                         context,
                         'RAM',
                         Icons.storage,
-                        '/memory',
                       ),
                       _buildComponentTile(
                         context,
                         'Storage',
                         Icons.sd_storage,
-                        '/storage',
                       ),
                       _buildComponentTile(
                         context,
                         'Case',
                         Icons.cases,
-                        '/cases',
                       ),
                       _buildComponentTile(
                         context,
                         'PSU',
                         Icons.bolt,
-                        '/psu',
                       ),
                     ],
                   ),
@@ -247,46 +258,67 @@ class HomeScreen extends StatelessWidget {
     BuildContext context,
     String title,
     IconData icon,
-    String route,
   ) {
-    return InkWell(
-      onTap: () => context.go(route),
-      borderRadius: BorderRadius.circular(12),
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: SizedBox(
-          width: 200,
-          height: 150,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                icon,
-                size: 50,
-                color: Theme.of(context).primaryColor,
+    // Get the route based on component type
+    String route = '';
+    switch (title) {
+      case 'Processor':
+        route = '/processors';
+        break;
+      case 'Graphics Card':
+        route = '/gpu';
+        break;
+      case 'Motherboard':
+        route = '/motherboard';
+        break;
+      case 'RAM':
+        route = '/memory';
+        break;
+      case 'Storage':
+        route = '/storage';
+        break;
+      case 'Case':
+        route = '/cases';
+        break;
+      case 'PSU':
+        route = '/psu';
+        break;
+    }
+    
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: SizedBox(
+        width: 200,
+        height: 150,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 50,
+              color: Theme.of(context).primaryColor,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
               ),
-              const SizedBox(height: 16),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+            ),
+            const SizedBox(height: 8),
+            ElevatedButton(
+              onPressed: () => context.go(route),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).primaryColor,
+                foregroundColor: Colors.white,
               ),
-              const SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: () => context.go(route),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
-                  foregroundColor: Colors.white,
-                ),
-                child: const Text('View Options'),
-              ),
-            ],
-          ),
+              child: const Text('View Options'),
+            ),
+          ],
         ),
       ),
     );

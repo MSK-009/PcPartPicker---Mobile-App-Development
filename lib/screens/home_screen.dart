@@ -18,7 +18,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(title: 'PC Part Picker'),
+      appBar: const CustomAppBar(title: 'PC Part Picker', showBackButton: false),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -125,7 +125,7 @@ class HomeScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 30),
                         ElevatedButton(
-                          onPressed: () => context.go('/processors'),
+                          onPressed: () => context.go('/pc-builder'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Theme.of(context).primaryColor,
                             padding: const EdgeInsets.symmetric(

@@ -6,11 +6,13 @@ import 'package:pc_part_picker/providers/list_provider.dart';
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final bool showActions;
+  final bool showBackButton;
 
   const CustomAppBar({
     Key? key,
     required this.title,
     this.showActions = true,
+    this.showBackButton = true,
   }) : super(key: key);
 
   @override
@@ -18,6 +20,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     final listProvider = Provider.of<ListProvider>(context);
 
     return AppBar(
+      leading: showBackButton ? IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+      ) : null,
       title: Row(
         children: [
           Icon(Icons.computer, size: 30, color: Colors.white),
@@ -27,6 +35,30 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       actions: showActions
           ? [
+              IconButton(
+                icon: const Icon(Icons.home),
+                tooltip: 'Go to Home',
+                onPressed: () {
+                  context.go('/');
+                },
+              ),
+              TextButton.icon(
+                icon: const Icon(Icons.computer, color: Colors.white),
+                label: const Text(
+                  'BUILD PC',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                onPressed: () {
+                  context.go('/pc-builder');
+                },
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                ),
+              ),
               Stack(
                 alignment: Alignment.center,
                 children: [
@@ -67,6 +99,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                 ],
               ),
+              buildComponentNavigationMenu(context),
               PopupMenuButton<String>(
                 onSelected: (value) {
                   if (value == 'home') {
@@ -379,6 +412,110 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget buildComponentNavigationMenu(BuildContext context) {
+    return PopupMenuButton<String>(
+      icon: const Icon(Icons.memory),
+      tooltip: 'Navigate to component',
+      onSelected: (value) {
+        switch (value) {
+          case 'processors':
+            context.go('/processors');
+            break;
+          case 'gpu':
+            context.go('/gpu');
+            break;
+          case 'motherboard':
+            context.go('/motherboard');
+            break;
+          case 'ram':
+            context.go('/memory');
+            break;
+          case 'ssd':
+            context.go('/storage');
+            break;
+          case 'cases':
+            context.go('/cases');
+            break;
+          case 'psu':
+            context.go('/psu');
+            break;
+        }
+      },
+      itemBuilder: (BuildContext context) => [
+        const PopupMenuItem<String>(
+          value: 'processors',
+          child: Row(
+            children: [
+              Icon(Icons.memory, color: Colors.black),
+              SizedBox(width: 8),
+              Text('Processors'),
+            ],
+          ),
+        ),
+        const PopupMenuItem<String>(
+          value: 'gpu',
+          child: Row(
+            children: [
+              Icon(Icons.videogame_asset, color: Colors.black),
+              SizedBox(width: 8),
+              Text('Graphics Cards'),
+            ],
+          ),
+        ),
+        const PopupMenuItem<String>(
+          value: 'motherboard',
+          child: Row(
+            children: [
+              Icon(Icons.dashboard, color: Colors.black),
+              SizedBox(width: 8),
+              Text('Motherboards'),
+            ],
+          ),
+        ),
+        const PopupMenuItem<String>(
+          value: 'ram',
+          child: Row(
+            children: [
+              Icon(Icons.storage, color: Colors.black),
+              SizedBox(width: 8),
+              Text('RAM'),
+            ],
+          ),
+        ),
+        const PopupMenuItem<String>(
+          value: 'ssd',
+          child: Row(
+            children: [
+              Icon(Icons.sd_storage, color: Colors.black),
+              SizedBox(width: 8),
+              Text('Storage'),
+            ],
+          ),
+        ),
+        const PopupMenuItem<String>(
+          value: 'cases',
+          child: Row(
+            children: [
+              Icon(Icons.cases, color: Colors.black),
+              SizedBox(width: 8),
+              Text('Cases'),
+            ],
+          ),
+        ),
+        const PopupMenuItem<String>(
+          value: 'psu',
+          child: Row(
+            children: [
+              Icon(Icons.bolt, color: Colors.black),
+              SizedBox(width: 8),
+              Text('Power Supplies'),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

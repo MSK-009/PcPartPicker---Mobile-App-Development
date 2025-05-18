@@ -21,6 +21,7 @@ import 'package:pc_part_picker/screens/cases_screen.dart';
 import 'package:pc_part_picker/screens/power_screen.dart';
 import 'package:pc_part_picker/screens/final_screen.dart';
 import 'package:pc_part_picker/screens/builds_screen.dart';
+import 'package:pc_part_picker/screens/pc_builder_screen.dart';
 import 'package:pc_part_picker/helpers/fix_cors_and_rendering_issues.dart';
 
 void main() {
@@ -29,6 +30,80 @@ void main() {
   LayoutHelper.printDebugInfo();
   
   runApp(const MyApp());
+}
+
+// Scaffold with bottom navigation bar
+class MainScaffold extends StatelessWidget {
+  final Widget child;
+  final String currentPath;
+
+  const MainScaffold({
+    Key? key,
+    required this.child,
+    required this.currentPath,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: child,
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _getSelectedIndex(currentPath),
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: Theme.of(context).primaryColor,
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.computer),
+            label: 'Build PC',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.memory),
+            label: 'Components',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.folder),
+            label: 'Builds',
+          ),
+        ],
+        onTap: (index) {
+          // Navigate based on index
+          switch (index) {
+            case 0:
+              context.go('/');
+              break;
+            case 1:
+              context.go('/pc-builder');
+              break;
+            case 2:
+              context.go('/processors'); // Components start with processors
+              break;
+            case 3:
+              context.go('/builds');
+              break;
+          }
+        },
+      ),
+    );
+  }
+
+  int _getSelectedIndex(String path) {
+    if (path == '/') return 0;
+    if (path == '/pc-builder') return 1;
+    if (path.contains('/processor') || 
+        path.contains('/gpu') || 
+        path.contains('/motherboard') || 
+        path.contains('/memory') || 
+        path.contains('/storage') || 
+        path.contains('/cases') || 
+        path.contains('/psu')) return 2;
+    if (path == '/builds') return 3;
+    return 0; // Default to home
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -93,49 +168,63 @@ class MyApp extends StatelessWidget {
 
 final GoRouter _router = GoRouter(
   routes: [
-    GoRoute(
-      path: '/',
-      builder: (context, state) => const HomeScreen(),
-    ),
-    GoRoute(
-      path: '/about',
-      builder: (context, state) => const ContactScreen(),
-    ),
-    GoRoute(
-      path: '/processors',
-      builder: (context, state) => const ProcessorsScreen(),
-    ),
-    GoRoute(
-      path: '/gpu',
-      builder: (context, state) => const GraphicsScreen(),
-    ),
-    GoRoute(
-      path: '/motherboard',
-      builder: (context, state) => const MotherboardScreen(),
-    ),
-    GoRoute(
-      path: '/memory',
-      builder: (context, state) => const RamScreen(),
-    ),
-    GoRoute(
-      path: '/storage',
-      builder: (context, state) => const SsdScreen(),
-    ),
-    GoRoute(
-      path: '/cases',
-      builder: (context, state) => const CasesScreen(),
-    ),
-    GoRoute(
-      path: '/psu',
-      builder: (context, state) => const PowerScreen(),
-    ),
-    GoRoute(
-      path: '/final',
-      builder: (context, state) => const FinalScreen(),
-    ),
-    GoRoute(
-      path: '/builds',
-      builder: (context, state) => const BuildsScreen(),
+    ShellRoute(
+      builder: (context, state, child) {
+        return MainScaffold(
+          child: child,
+          currentPath: state.uri.path,
+        );
+      },
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (context, state) => const HomeScreen(),
+        ),
+        GoRoute(
+          path: '/about',
+          builder: (context, state) => const ContactScreen(),
+        ),
+        GoRoute(
+          path: '/pc-builder',
+          builder: (context, state) => const PcBuilderScreen(),
+        ),
+        GoRoute(
+          path: '/processors',
+          builder: (context, state) => const ProcessorsScreen(),
+        ),
+        GoRoute(
+          path: '/gpu',
+          builder: (context, state) => const GraphicsScreen(),
+        ),
+        GoRoute(
+          path: '/motherboard',
+          builder: (context, state) => const MotherboardScreen(),
+        ),
+        GoRoute(
+          path: '/memory',
+          builder: (context, state) => const RamScreen(),
+        ),
+        GoRoute(
+          path: '/storage',
+          builder: (context, state) => const SsdScreen(),
+        ),
+        GoRoute(
+          path: '/cases',
+          builder: (context, state) => const CasesScreen(),
+        ),
+        GoRoute(
+          path: '/psu',
+          builder: (context, state) => const PowerScreen(),
+        ),
+        GoRoute(
+          path: '/final',
+          builder: (context, state) => const FinalScreen(),
+        ),
+        GoRoute(
+          path: '/builds',
+          builder: (context, state) => const BuildsScreen(),
+        ),
+      ],
     ),
   ],
 ); 
