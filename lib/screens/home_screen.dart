@@ -3,6 +3,14 @@ import 'package:go_router/go_router.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:pc_part_picker/widgets/app_bar.dart';
 import 'package:pc_part_picker/widgets/footer_widget.dart';
+import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
+
+final List<String> imagePaths = [
+  'pc1.webp',
+  'pc2.webp',
+  'pc3.webp',
+  'pc4.png',
+];
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -144,21 +152,25 @@ class HomeScreen extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 40),
-                    // Image Content
-                    Container(
-                      width: double.infinity,
-                      height: 300,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade800,
-                        borderRadius: BorderRadius.circular(16),
+
+                    FlutterCarousel(
+                      options: CarouselOptions(
+                        height: 400.0,
+                        autoPlay: true,
+                        enlargeCenterPage: true,
+                        showIndicator: true,
+                        floatingIndicator: true,
                       ),
-                      child: const Center(
-                        child: Icon(
-                          Icons.computer,
-                          size: 100,
-                          color: Colors.white54,
-                        ),
-                      ),
+                      items: imagePaths.map((path) {
+                        return ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.asset(
+                            path,
+                            fit: BoxFit.contain,
+                            width: double.infinity,
+                          ),
+                        );
+                      }).toList(),
                     ),
                   ],
                 ),
