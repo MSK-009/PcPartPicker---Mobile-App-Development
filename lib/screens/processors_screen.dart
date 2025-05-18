@@ -345,12 +345,12 @@ class _ProcessorsScreenState extends State<ProcessorsScreen> {
                     : SingleChildScrollView(
                         controller: _scrollController,
                         child: Padding(
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(0),
                           child: Column(
                             children: [
                               // Grid of Processor Cards
                               AlignedGridView.count(
-                                crossAxisCount: widget.isBuilderMode ? 2 : 3,
+                                crossAxisCount: widget.isBuilderMode ? 2 : 2,
                                 mainAxisSpacing: 16,
                                 crossAxisSpacing: 16,
                                 shrinkWrap: true,

@@ -249,12 +249,12 @@ class _PowerScreenState extends State<PowerScreen> {
                     : SingleChildScrollView(
                         controller: _scrollController,
                         child: Padding(
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(0),
                           child: Column(
                             children: [
                               // Grid of PSU Cards
                               AlignedGridView.count(
-                                crossAxisCount: 3,
+                                crossAxisCount: 2,
                                 mainAxisSpacing: 16,
                                 crossAxisSpacing: 16,
                                 shrinkWrap: true,
