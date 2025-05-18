@@ -243,12 +243,13 @@ class _CasesScreenState extends State<CasesScreen> {
                     : SingleChildScrollView(
                         controller: _scrollController,
                         child: Padding(
-                          padding: const EdgeInsets.all(16),
+                          padding:
+                              const EdgeInsets.all(0), //mcmdcmdckmdckmdcdmco
                           child: Column(
                             children: [
                               // Grid of Case Cards
                               AlignedGridView.count(
-                                crossAxisCount: 3,
+                                crossAxisCount: 2,
                                 mainAxisSpacing: 16,
                                 crossAxisSpacing: 16,
                                 shrinkWrap: true,
@@ -285,7 +286,6 @@ class _CasesScreenState extends State<CasesScreen> {
                               ),
                               const SizedBox(height: 30),
 
-                              // 👇 Move footer here
                               AnimatedSlide(
                                 offset: _showFooter
                                     ? Offset.zero
